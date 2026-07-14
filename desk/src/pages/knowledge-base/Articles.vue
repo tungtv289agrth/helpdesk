@@ -25,6 +25,7 @@
 <script setup lang="ts">
 import { onMounted, computed } from "vue";
 import { categoryName } from "@/stores/knowledgeBase";
+import { __ } from "@/translation";
 import { Breadcrumbs, createResource, usePageMeta } from "frappe-ui";
 import LayoutHeader from "@/components/LayoutHeader.vue";
 import ArticleCard from "@/components/knowledge-base/ArticleCard.vue";
@@ -65,7 +66,7 @@ const categoryTitle = computed(() => {
 const breadcrumbs = computed(() => {
   return [
     {
-      label: "Knowledge Base",
+      label: __("Knowledge Base"),
       route: {
         name: "CustomerKnowledgeBase",
       },
@@ -78,7 +79,7 @@ const breadcrumbs = computed(() => {
 
 usePageMeta(() => {
   return {
-    title: `${categoryTitle?.value}` + " - " + "Knowledge Base",
+    title: `${categoryTitle?.value}` + " - " + __("Knowledge Base"),
   };
 });
 </script>

@@ -86,7 +86,7 @@ class HDArticle(Document):
                 "width": "17rem",
             },
             {
-                "label": "Last Modified",
+                "label": _("Last Modified"),
                 "type": "Datetime",
                 "key": "modified",
                 "width": "8rem",

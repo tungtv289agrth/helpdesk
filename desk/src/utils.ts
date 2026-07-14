@@ -295,7 +295,7 @@ export async function copyToClipboard(
 }
 
 export const ClearFormattingUtility = {
-  label: "Clear formatting",
+  label: __("Clear formatting"),
   icon: LucideBrushCleaning,
   action: (editor) => {
     editor.chain().focus().unsetAllMarks().clearNodes().cleanStyles().run();
@@ -703,10 +703,10 @@ export function getFieldDependencyLabel(name: string) {
 export function ConfirmDelete({ isConfirmingDelete, onConfirmDelete }) {
   return [
     {
-      label: "Delete",
+      label: __("Delete"),
       component: (props) =>
         TemplateOption({
-          option: "Delete",
+          option: __("Delete"),
           icon: "lucide-trash-2",
           active: props.active,
           variant: "grey",
@@ -719,10 +719,10 @@ export function ConfirmDelete({ isConfirmingDelete, onConfirmDelete }) {
       condition: () => !isConfirmingDelete.value,
     },
     {
-      label: "Confirm Delete",
+      label: __("Confirm Delete"),
       component: (props) =>
         TemplateOption({
-          option: "Confirm Delete",
+          option: __("Confirm Delete"),
           icon: "lucide-trash-2",
           active: props.active,
           variant: "danger",

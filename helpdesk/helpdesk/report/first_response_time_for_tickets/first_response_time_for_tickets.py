@@ -4,20 +4,21 @@
 from __future__ import unicode_literals
 
 import frappe
+from frappe import _
 
 
 def execute(filters=None):
     columns = [
         {
             "fieldname": "creation_date",
-            "label": "Date",
+            "label": _("Date"),
             "fieldtype": "Date",
             "width": 300,
         },
         {
             "fieldname": "first_response_time",
             "fieldtype": "Duration",
-            "label": "First Response Time",
+            "label": _("First Response Time"),
             "width": 300,
         },
     ]

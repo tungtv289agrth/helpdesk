@@ -66,6 +66,7 @@
 
 <script setup lang="ts">
 import { VNode, computed } from "vue";
+import { __ } from "@/translation";
 interface Props {
   title: string;
   icon?: VNode | string;
@@ -75,7 +76,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  title: "No Data Found",
+  title: __("No Data Found"),
   icon: "",
   variant: "default",
   text: "lg",
@@ -84,9 +85,9 @@ const props = withDefaults(defineProps<Props>(), {
 const descriptionText = computed(() =>
   props.description !== undefined && props.description !== ""
     ? props.description
-    : `Create new ${props.title
+    : __("Create new {0} using the Create button.", [props.title
         .split(" ")[1]
-        .toLocaleLowerCase()} using the Create button.`
+        .toLocaleLowerCase()])
 );
 </script>
 

@@ -6,7 +6,7 @@
     <template #header-actions>
       <Button
         @click="() => setActiveSettingsTab('Invite Agents')"
-        label="New"
+        :label="__('New')"
         variant="solid"
         class="rtl:flex-row-reverse"
       >
@@ -91,11 +91,11 @@
           v-if="!agents.loading && !agents.data?.length"
           variant="badge"
           :icon="AgentIcon"
-          title="No agent found"
+          :title="__('No agent found')"
           :description="
             activeFilter.length
-              ? 'Change your search terms or filters'
-              : 'Add one to get started.'
+              ? __('Change your search terms or filters')
+              : __('Add one to get started.')
           "
         />
         <!-- Agent List -->
@@ -205,10 +205,10 @@ function getRoles(agent: string) {
   const agentRole = getUserRole(agent);
   const roles = [
     {
-      label: "Agent",
+      label: __("Agent"),
       component: (props) =>
         RoleOption({
-          role: "Agent",
+          role: __("Agent"),
           active: props.active,
           selected: agentRole === "Agent",
           icon: "lucide-user",
@@ -220,10 +220,10 @@ function getRoles(agent: string) {
   ];
   if (isManager) {
     roles.unshift({
-      label: "Manager",
+      label: __("Manager"),
       component: (props) =>
         RoleOption({
-          role: "Manager",
+          role: __("Manager"),
           active: props.active,
           selected: agentRole === "Manager",
           icon: "lucide-briefcase",
@@ -281,7 +281,7 @@ function getOptions(agent) {
   let filters = agentStore.filters;
   return [
     {
-      label: "Disable Agent",
+      label: __("Disable Agent"),
       icon: "lucide-x-circle",
       onClick: async () => {
         await agentStore.updateAgent(agent.name, 0);
@@ -290,7 +290,7 @@ function getOptions(agent) {
       condition: () => agent.is_active,
     },
     {
-      label: "Enable Agent",
+      label: __("Enable Agent"),
       icon: "lucide-check-circle",
       onClick: async () => {
         await agentStore.updateAgent(agent.name, 1);
@@ -303,24 +303,24 @@ function getOptions(agent) {
 
 const dropdownOptions = [
   {
-    label: "All",
+    label: __("All"),
     onClick: () => {
       agentStore.filters["is_active"] = ["in", [0, 1]];
-      activeFilter.value = "All";
+      activeFilter.value = __("All");
     },
   },
   {
-    label: "Active",
+    label: __("Active"),
     onClick: () => {
       agentStore.filters["is_active"] = ["=", 1];
-      activeFilter.value = "Active";
+      activeFilter.value = __("Active");
     },
   },
   {
-    label: "Inactive",
+    label: __("Inactive"),
     onClick: () => {
       agentStore.filters["is_active"] = ["=", 0];
-      activeFilter.value = "Inactive";
+      activeFilter.value = __("Inactive");
     },
   },
 ];

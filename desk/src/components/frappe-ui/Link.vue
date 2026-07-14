@@ -50,7 +50,7 @@
           <Button
             variant="ghost"
             class="w-full !justify-start"
-            :label="'Create New'"
+            :label="__('Create New')"
             @click="attrs.onCreate(value, close)"
           >
             <template #prefix>
@@ -62,7 +62,7 @@
           <Button
             variant="ghost"
             class="w-full !justify-start"
-            :label="'Clear'"
+            :label="__('Clear')"
             @click="() => clearValue(close)"
           >
             <template #prefix>
@@ -76,6 +76,7 @@
 </template>
 
 <script setup>
+import { __ } from "@/translation";
 import { watchDebounced } from "@vueuse/core";
 import { createResource } from "frappe-ui";
 import { computed, ref, useAttrs, watch } from "vue";
@@ -188,7 +189,7 @@ const options = createResource({
       (props.doctype == "User" || props.doctype == "HD Agent")
     ) {
       allData.unshift({
-        label: "@me",
+        label: __("@me"),
         value: "@me",
       });
     }

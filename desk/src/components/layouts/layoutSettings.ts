@@ -2,7 +2,6 @@ import LucideBookOpen from "~icons/lucide/book-open";
 import LucideContact2 from "~icons/lucide/contact-2";
 import LucideTicket from "~icons/lucide/ticket";
 import LucideLayoutDashboard from "~icons/lucide/layout-dashboard";
-import { OrganizationsIcon } from "../icons";
 import PhoneIcon from "../icons/PhoneIcon.vue";
 import LucideHome from "~icons/lucide/home";
 import { __ } from "@/translation";
@@ -27,11 +26,6 @@ export const agentPortalSidebarOptions = [
     label: __("Knowledge Base"),
     icon: LucideBookOpen,
     to: "AgentKnowledgeBase",
-  },
-  {
-    label: __("Customers"),
-    icon: OrganizationsIcon,
-    to: "CustomerList",
   },
   {
     label: __("Contacts"),

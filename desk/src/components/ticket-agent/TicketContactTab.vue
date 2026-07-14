@@ -31,7 +31,7 @@
             @click="
               copyToClipboard(
                 contact.data.email_id,
-                `'${contact.data.email_id}' copied to clipboard`
+                __("'{0}' copied to clipboard", contact.data.email_id)
               )
             "
           />
@@ -53,9 +53,7 @@
             @click="
               copyToClipboard(
                 contact.data.mobile_no || contact.data.phone,
-                `'${
-                  contact.data.mobile_no || contact.data.phone
-                }' copied to clipboard`
+                __("'{0}' copied to clipboard", contact.data.mobile_no || contact.data.phone)
               )
             "
           />
@@ -125,6 +123,7 @@
 </template>
 
 <script setup lang="ts">
+import { __ } from "@/translation";
 import { useTelephonyStore } from "@/stores/telephony";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { RecentSimilarTicketsSymbol, TicketContactSymbol } from "@/types";
@@ -166,8 +165,8 @@ const sections = computed(() => {
   const _sections = [];
   if (recentTickets.length) {
     _sections.push({
-      label: "Recent Tickets",
-      tooltipMessage: "Tickets recently raised by this contact/customer",
+      label: __("Recent Tickets"),
+      tooltipMessage: __("Tickets recently raised by this contact/customer"),
       hideLabel: false,
       opened: true,
       tickets: recentTickets,
@@ -175,8 +174,8 @@ const sections = computed(() => {
   }
   if (similarTickets.length) {
     _sections.push({
-      label: "Similar Tickets",
-      tooltipMessage: "Tickets with similar queries",
+      label: __("Similar Tickets"),
+      tooltipMessage: __("Tickets with similar queries"),
       hideLabel: false,
       opened: true,
       tickets: similarTickets,

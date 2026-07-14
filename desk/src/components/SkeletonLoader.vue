@@ -107,6 +107,7 @@
 </template>
 
 <script setup>
+import { __ } from "@/translation";
 import { useSlots } from "vue";
 
 const props = defineProps({
@@ -128,11 +129,11 @@ const props = defineProps({
 const slots = useSlots();
 
 const defaultEmptyStateMsg = {
-  title: "No tickets found",
+  title: __("No tickets found"),
   message:
-    "Dashboard charts will appear here once you start receiving or creating tickets.",
+    __("Dashboard charts will appear here once you start receiving or creating tickets."),
   filterMessage:
-    "Based on the selected filters no tickets found. Try adjusting the date range or filters applied.",
+    __("Based on the selected filters no tickets found. Try adjusting the date range or filters applied."),
 };
 
 function getEmptyState(index) {

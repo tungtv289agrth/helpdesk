@@ -183,7 +183,7 @@
                 from this UI.
               </span>
               <Button
-                label="I understand, add conditions"
+                :label="__('I understand, add conditions')"
                 variant="subtle"
                 theme="gray"
                 @click="useNewUIForAssignCondition = true"
@@ -264,7 +264,7 @@
                 from this UI.
               </span>
               <Button
-                label="I understand, add conditions"
+                :label="__('I understand, add conditions')"
                 variant="subtle"
                 theme="gray"
                 @click="useNewUIForUnassignCondition = true"
@@ -390,7 +390,7 @@ const getAssignmentRuleData = createResource({
       assignConditionJson = JSON.parse(data.assign_condition_json || "[]");
     } catch (error) {
       toast.error(
-        "Assignment conditions are invalid or corrupt, recreate the conditions."
+        __("Assignment conditions are invalid or corrupt, recreate the conditions.")
       );
       assignConditionJson = [];
     }
@@ -398,7 +398,7 @@ const getAssignmentRuleData = createResource({
       unassignConditionJson = JSON.parse(data.unassign_condition_json || "[]");
     } catch (error) {
       toast.error(
-        "Unassignment conditions are invalid or corrupt, recreate the conditions."
+        __("Unassignment conditions are invalid or corrupt, recreate the conditions.")
       );
       unassignConditionJson = [];
     }
@@ -508,9 +508,9 @@ const saveAssignmentRule = () => {
 const showOverwriteConfirm = () => {
   showConfirmDialog.value = {
     show: true,
-    title: "Confirm overwrite",
+    title: __("Confirm overwrite"),
     message:
-      "Your old condition will be overwritten. Are you sure you want to save?",
+      __("Your old condition will be overwritten. Are you sure you want to save?"),
     onConfirm: () => {
       updateAssignmentRule();
       showConfirmDialog.value.show = false;
@@ -565,11 +565,11 @@ const createAssignmentRuleResource = createResource({
 });
 
 const priorityOptions = [
-  { label: "Low", value: "0" },
-  { label: "Low-Medium", value: "1" },
-  { label: "Medium", value: "2" },
-  { label: "Medium-High", value: "3" },
-  { label: "High", value: "4" },
+  { label: __("Low"), value: "0" },
+  { label: __("Low-Medium"), value: "1" },
+  { label: __("Medium"), value: "2" },
+  { label: __("Medium-High"), value: "3" },
+  { label: __("High"), value: "4" },
 ];
 
 const updateAssignmentRule = async () => {

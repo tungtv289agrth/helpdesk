@@ -1,12 +1,12 @@
 <template>
-  <Dialog v-model:open="showDialog" title="Move To" :actions="actions">
+  <Dialog v-model:open="showDialog" :title="__('Move To')" :actions="actions">
     <template #default>
       <div class="flex flex-col flex-1 gap-3">
         <Link
           ref="linkRef"
           class="w-full"
           doctype="HD Article Category"
-          placeholder="Select Category"
+          :placeholder="__('Select Category')"
           v-model="category"
           label="Category"
           :filters="defaultFilters"
@@ -18,6 +18,7 @@
 </template>
 
 <script setup lang="ts">
+import { __ } from "@/translation";
 import { ref, computed, watch, nextTick } from "vue";
 import { Dialog } from "frappe-ui";
 import Link from "@/components/frappe-ui/Link.vue";
@@ -48,7 +49,7 @@ watch(showDialog, async (val) => {
 
 const actions = [
   {
-    label: "Move",
+    label: __("Move"),
     variant: "solid",
     onClick: () => {
       emit("move", category.value);

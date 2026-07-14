@@ -1,3 +1,4 @@
+import { __ } from "@/translation";
 import { useAuthStore } from "@/stores/auth";
 import { View } from "@/types";
 import { getIcon, isCustomerPortal } from "@/utils";
@@ -31,7 +32,7 @@ export const views = createListResource({
 });
 
 export const currentView = ref({
-  label: "List",
+  label: __("List"),
   icon: LucideAlignJustify,
 });
 

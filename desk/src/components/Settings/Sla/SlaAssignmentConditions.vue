@@ -30,6 +30,7 @@
 </template>
 
 <script setup lang="ts">
+import { __ } from "@/translation";
 import { Button, Dropdown, ErrorMessage, FeatherIcon } from "frappe-ui";
 import { slaDataErrors, validateSlaData } from "@/stores/sla";
 import { watchDebounced } from "@vueuse/core";
@@ -55,13 +56,13 @@ const getConjunction = () => {
 
 const dropdownOptions = [
   {
-    label: "Add condition",
+    label: __("Add condition"),
     onClick: () => {
       addCondition();
     },
   },
   {
-    label: "Add condition group",
+    label: __("Add condition group"),
     onClick: () => {
       const conjunction = getConjunction();
       props.conditions.push(conjunction, [[]]);

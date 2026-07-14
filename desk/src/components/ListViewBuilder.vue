@@ -382,7 +382,7 @@ const list = createResource({
   },
   onSuccess: (data) => {
     list.params = defaultParams;
-    columns.value = data.columns;
+    columns.value = data.columns.map((c) => ({ ...c, label: __(c.label) }));
   },
 });
 
@@ -511,7 +511,7 @@ const quickFilters = createResource({
   },
   transform: (data) => {
     if (Boolean(data.length)) return;
-    data = [{ name: "name", label: "Name", fieldtype: "Data" }];
+      data = [{ name: "name", label: __("Name"), fieldtype: "Data" }];
     return data;
   },
 });
@@ -639,7 +639,7 @@ function updateColumns(obj) {
     handleFetchFromField(column);
     handleColumnConfig(column);
   });
-  columns.value = defaultParams.columns = isDefault ? "" : _columns;
+  columns.value = defaultParams.columns = isDefault ? "" : _columns.map((c) => ({ ...c, label: __(c.label) }));
   defaultParams.rows = isDefault ? "" : rows;
   list.reload({ ...defaultParams });
 }

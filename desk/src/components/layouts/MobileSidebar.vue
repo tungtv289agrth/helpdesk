@@ -23,7 +23,7 @@
               <div class="flex flex-col gap-1">
                 <SidebarLink
                   class="relative"
-                  label="Notifications"
+                  :label="__('Notifications')"
                   :icon="LucideBell"
                   :on-click="() => (sidebarOpened = false)"
                   :is-expanded="true"
@@ -130,12 +130,13 @@ import {
   customerPortalSidebarOptions,
 } from "./layoutSettings";
 import { useTelephonyStore } from "@/stores/telephony";
+import { __ } from "@/translation";
 import { storeToRefs } from "pinia";
 const { pinnedViews, publicViews } = useView();
 const { currentTheme, toggleTheme } = useTheme();
 
 const themeMenuItem = computed(() => ({
-  label: "Toggle theme",
+  label: __("Toggle theme"),
   icon: currentTheme.value === "dark" ? LucideSun : LucideMoon,
   onClick: () => toggleTheme(),
 }));
@@ -158,7 +159,7 @@ const allViews = computed(() => {
 
   const options = [
     {
-      label: "All Views",
+      label: __("All Views"),
       hideLabel: true,
       opened: true,
       views: items,
@@ -166,7 +167,7 @@ const allViews = computed(() => {
   ];
   if (publicViews.value?.length && !isCustomerPortal.value) {
     options.push({
-      label: "Public Views",
+      label: __("Public Views"),
       opened: true,
       hideLabel: false,
       views: parseViews(publicViews.value),
@@ -174,7 +175,7 @@ const allViews = computed(() => {
   }
   if (pinnedViews.value?.length) {
     options.push({
-      label: "Private Views",
+      label: __("Private Views"),
       opened: true,
       hideLabel: false,
       views: parseViews(pinnedViews.value),
@@ -204,7 +205,7 @@ function parseViews(views) {
 const customerPortalDropdown = computed(() => [
   themeMenuItem.value,
   {
-    label: "Log out",
+    label: __("Log out"),
     icon: "lucide-log-out",
     onClick: () => authStore.logout(),
   },
@@ -222,7 +223,7 @@ const agentPortalDropdown = computed(() => [
       ]
     : []),
   {
-    label: "Customer portal",
+    label: __("Customer portal"),
     icon: "lucide-users",
     onClick: () => {
       const path = router.resolve({ name: "TicketsCustomer" });
@@ -231,17 +232,17 @@ const agentPortalDropdown = computed(() => [
   },
   {
     icon: "lucide-life-buoy",
-    label: "Support",
+    label: __("Support"),
     onClick: () => window.open("https://t.me/frappedesk"),
   },
   {
     icon: "lucide-book-open",
-    label: "Docs",
+    label: __("Docs"),
     onClick: () => window.open("https://docs.frappe.io/helpdesk"),
   },
   themeMenuItem.value,
   {
-    label: "Log out",
+    label: __("Log out"),
     icon: "lucide-log-out",
     onClick: () => authStore.logout(),
   },

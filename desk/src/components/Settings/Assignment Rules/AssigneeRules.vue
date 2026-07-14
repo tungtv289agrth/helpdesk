@@ -114,6 +114,7 @@
 </template>
 
 <script setup lang="ts">
+import { __ } from "@/translation";
 import { Avatar, Button, ErrorMessage, Popover, Tooltip } from "frappe-ui";
 import {
   assignmentRuleData,
@@ -128,11 +129,11 @@ const { getUser } = useUserStore();
 
 const ticketRoutingOptions = [
   {
-    label: "Auto-rotate",
+    label: __("Auto-rotate"),
     value: "Round Robin",
   },
   {
-    label: "Assign by workload",
+    label: __("Assign by workload"),
     value: "Load Balancing",
   },
 ];

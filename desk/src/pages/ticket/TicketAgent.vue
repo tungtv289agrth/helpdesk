@@ -77,6 +77,7 @@ import {
 import { computed, onBeforeUnmount, onMounted, provide, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { showCommentBox, showEmailBox } from "./modalStates";
+import { __ } from "@/translation";
 
 const telephonyStore = useTelephonyStore();
 
@@ -178,7 +179,7 @@ onMounted(() => {
   $socket.on("ticket_update", (data: TicketUpdateData) => {
     if (data.ticket_id === ticket.value?.name) {
       // Notify the user about the update
-      toast.info(`User ${data.user} updated ${data.field} to ${data.value}`);
+      toast.info(__("User {0} updated {1} to {2}", [data.user, data.field, data.value]));
     }
   });
 

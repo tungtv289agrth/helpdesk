@@ -263,28 +263,28 @@ const colors = [
 ];
 const emptyStates = [
   {
-    title: "No ticket activity",
-    message: "Ticket trends will appear here once tickets are created.",
+    title: __("No ticket activity"),
+    message: __("Ticket trends will appear here once tickets are created."),
   },
   {
-    title: "No feedback data",
-    message: "Feedback insights will appear once responses are collected.",
+    title: __("No feedback data"),
+    message: __("Feedback insights will appear once responses are collected."),
   },
   {
-    title: "No team data",
-    message: "Tickets will be grouped by team once available.",
+    title: __("No team data"),
+    message: __("Tickets will be grouped by team once available."),
   },
   {
-    title: "No ticket type data",
-    message: "Tickets will be categorized by type once created.",
+    title: __("No ticket type data"),
+    message: __("Tickets will be categorized by type once created."),
   },
   {
-    title: "No priority data",
-    message: "Ticket priorities will be reflected here once assigned.",
+    title: __("No priority data"),
+    message: __("Ticket priorities will be reflected here once assigned."),
   },
   {
-    title: "No channel data",
-    message: "Tickets will be grouped by channel once received.",
+    title: __("No channel data"),
+    message: __("Tickets will be grouped by channel once received."),
   },
 ];
 
@@ -299,12 +299,12 @@ const tabButtons = computed(() => {
     {
       value: "organization",
       iconLeft: h(LucideBuilding2, { class: "size-4" }),
-      label: "My Organization",
+      label: __("My Organization"),
     },
     {
       value: "my_stats",
       iconLeft: h(LucideUser, { class: "size-4" }),
-      label: "My Stats",
+      label: __("My Stats"),
     },
   ];
 });
