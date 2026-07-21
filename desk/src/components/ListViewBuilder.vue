@@ -500,6 +500,9 @@ const sortableFields = createResource({
     doctype: options.value.doctype,
     show_customer_portal_fields: defaultParams.show_customer_portal_fields,
   },
+  transform: (data) => {
+    return data.map((item) => ({ ...item, label: __(item.label) }));
+  },
 });
 
 const quickFilters = createResource({

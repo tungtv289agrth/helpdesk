@@ -200,6 +200,8 @@ class HDTicket(Document):
             log_ticket_activity(
                 self.name,
                 "split the ticket from #{0}".format(self.ticket_split_from),
+                activity_type="Ticket Split",
+                extra_value="#{0}".format(self.ticket_split_from),
             )
             capture_event("ticket_split")
 
@@ -355,11 +357,11 @@ class HDTicket(Document):
         Should be called inside on_update
         """
         field_maps = {
-            "status": "status",
-            "priority": "priority",
-            "agent_group": "team",
-            "ticket_type": "type",
-            "contact": "contact",
+            "status": "Status",
+            "priority": "Priority",
+            "agent_group": "Team",
+            "ticket_type": "Ticket Type",
+            "contact": "Contact",
             "sla": "SLA",
         }
         for field in [
@@ -371,13 +373,23 @@ class HDTicket(Document):
             "sla",
         ]:
             if self.has_value_changed(field):
-                value = self.as_dict()[field]
-                if not value:
+                new_value = self.as_dict()[field]
+                if not new_value:
                     msg = f"cleared {field_maps[field]}"
+                    log_ticket_activity(
+                        self.name,
+                        msg,
+                        activity_type="Field Cleared",
+                        extra_value=field_maps[field],
+                    )
                 else:
-                    msg = f"set {field_maps[field]} to {value}"
-
-                log_ticket_activity(self.name, msg)
+                    msg = f"set {field_maps[field]} to {new_value}"
+                    log_ticket_activity(
+                        self.name,
+                        msg,
+                        activity_type="Field Changed",
+                        extra_value=field_maps[field] + "||" + str(new_value),
+                    )
 
     def generate_key(self):
         self.key = uuid.uuid4()
@@ -1381,9 +1393,12 @@ def close_tickets_after_n_days():
         try:
             doc.save(ignore_permissions=True)
             # activity log for auto closing the ticket
+            days_str = f"{days_threshold} day{'s' if days_threshold > 1 else ''}"
             log_ticket_activity(
                 doc.name,
-                f"automatically closed the ticket after {days_threshold} day{'s' if days_threshold > 1 else ''} of inactivity",
+                f"automatically closed the ticket after {days_str} of inactivity",
+                activity_type="Auto Closed",
+                extra_value=days_str,
             )
         except Exception as e:
             frappe.log_error(

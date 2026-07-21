@@ -208,20 +208,20 @@ const options = computed(() => ({
 function handleResponseByField(row: any, item: string) {
   if (!row.first_responded_on && dayjs(item).isBefore(new Date())) {
     return h(Badge, {
-      label: __("Failed"),
+      label: __("Ticket Failed"),
       theme: "red",
       variant: "subtle",
     });
   }
   if (row.first_responded_on && dayjs(row.first_responded_on).isBefore(item)) {
     return h(Badge, {
-      label: __("Fulfilled"),
+      label: __("Ticket Fulfilled"),
       theme: "gray",
       variant: "subtle",
     });
   } else if (dayjs(row.first_responded_on).isAfter(item)) {
     return h(Badge, {
-      label: __("Failed"),
+      label: __("Ticket Failed"),
       theme: "red",
       variant: "subtle",
     });
@@ -244,7 +244,7 @@ function handleResolutionByField(row: any, item: string) {
   const status = getStatus(row.status) || {};
   if (status.category === "Paused") {
     return h(Badge, {
-      label: __("Paused"),
+      label: __("Ticket Paused"),
       theme: "blue",
       variant: "subtle",
     });
@@ -254,7 +254,7 @@ function handleResolutionByField(row: any, item: string) {
       dayjs(row.resolution_by)
     );
     return h(Badge, {
-      label: fulfilled ? __("Fulfilled") : __("Failed"),
+      label: fulfilled ? __("Ticket Fulfilled") : __("Ticket Failed"),
       theme: fulfilled ? "gray" : "red",
       variant: "subtle",
     });
@@ -262,7 +262,7 @@ function handleResolutionByField(row: any, item: string) {
   // In progress but the resolution deadline has already passed.
   if (dayjs(item).isBefore(dayjs())) {
     return h(Badge, {
-      label: __("Failed"),
+      label: __("Ticket Failed"),
       theme: "red",
       variant: "subtle",
     });

@@ -233,7 +233,12 @@ def get_history(ticket: str):
     history = (
         frappe.qb.from_(QBActivity)
         .select(
-            QBActivity.name, QBActivity.action, QBActivity.owner, QBActivity.creation
+            QBActivity.name,
+            QBActivity.action,
+            QBActivity.activity_type,
+            QBActivity.extra_value,
+            QBActivity.owner,
+            QBActivity.creation,
         )
         .where(QBActivity.ticket == str(ticket))
         .orderby(QBActivity.creation, order=Order.desc)

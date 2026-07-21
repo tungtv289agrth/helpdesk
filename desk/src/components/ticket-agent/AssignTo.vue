@@ -463,14 +463,15 @@ watch(searchText, () => {
   highlightedIndex.value = 0;
 });
 
-async function logActivity(action: string) {
-  await call("frappe.client.insert", {
-    doc: {
-      doctype: "HD Ticket Activity",
-      ticket: ticket.value?.name,
-      action,
-    },
-  });
+async function logActivity(action: string, extraValue?: string) {
+  const doc: Record<string, any> = {
+    doctype: "HD Ticket Activity",
+    ticket: ticket.value?.name,
+    action,
+    activity_type: "Assignment",
+  };
+  if (extraValue) doc.extra_value = extraValue;
+  await call("frappe.client.insert", { doc });
 }
 
 async function assignSelf() {
@@ -487,7 +488,11 @@ async function assignSelf() {
 
   try {
     await addAssigneesResource.submit([currentAgentName]);
-    await logActivity(`assigned ${currentAgentName}`);
+    try {
+      await logActivity(`assigned ${currentAgentName}`, JSON.stringify({ added: [currentAgentName], removed: [] }));
+    } catch {
+      console.warn("Failed to log assignment activity for self-assign");
+    }
     capture("ticket_assigned", { doctype: "HD Ticket" });
     toast.success(__("Assignee's updated successfully."));
     assignees.value.reload();
@@ -544,6 +549,8 @@ function warnUnavailableAgents(addedNames: string[]): boolean {
     );
     hasUnavailable = true;
   }
+
+
   return hasUnavailable;
 }
 
@@ -563,12 +570,18 @@ async function saveAssignees(added: string[], removed: string[]) {
     }
 
     // Log activity only after API calls succeed
-    const logParts: string[] = [];
-    if (added.length) logParts.push(`assigned ${added.join(", ")}`);
-    if (removed.length) logParts.push(`unassigned ${removed.join(", ")}`);
-    await logActivity(logParts.join(" & "));
+    // Do this outside the main try-catch so a logging failure
+    // doesn't revert a successful assignment change.
+    try {
+      const logParts: string[] = [];
+      if (added.length) logParts.push(`assigned ${added.join(", ")}`);
+      if (removed.length) logParts.push(`unassigned ${removed.join(", ")}`);
+      const extraValue = JSON.stringify({ added, removed });
+      await logActivity(logParts.join(" & "), extraValue);
+    } catch {
+      console.warn("Failed to log assignment activity", added, removed);
+    }
 
-    // Delay the success toast when warnings were shown so they land first.
     const successDelay = hasUnavailable ? 1000 : 0;
     setTimeout(() => {
       toast.success(__("Assignees updated successfully."));

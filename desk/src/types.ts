@@ -161,6 +161,8 @@ export interface Communication {
 
 export interface Activity {
   action: string;
+  activity_type?: string;
+  extra_value?: string;
   name: string;
   owner: string;
   creation: string;

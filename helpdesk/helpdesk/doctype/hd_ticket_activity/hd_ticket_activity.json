@@ -7,6 +7,8 @@
  "engine": "InnoDB",
  "field_order": [
   "ticket",
+  "activity_type",
+  "extra_value",
   "action"
  ],
  "fields": [
@@ -16,6 +18,18 @@
    "label": "HD Ticket",
    "options": "HD Ticket",
    "search_index": 1
+  },
+  {
+   "fieldname": "activity_type",
+   "fieldtype": "Select",
+   "label": "Activity Type",
+   "options": "\nField Changed\nField Cleared\nTicket Split\nAuto Closed\nAssignment",
+   "default": ""
+  },
+  {
+   "fieldname": "extra_value",
+   "fieldtype": "Text",
+   "label": "Extra Value"
   },
   {
    "fieldname": "action",

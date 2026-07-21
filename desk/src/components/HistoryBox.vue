@@ -7,9 +7,9 @@
         v-if="relatedActivities.length > 1"
         class="inline-flex flex-wrap gap-1.5 text-ink-gray-8 font-medium w-4/5"
       >
-        <span>{{ `${show_others ? "Hide " : "Show "}` }}</span>
+        <span>{{ show_others ? __("Hide") : __("Show") }}</span>
         <span>+{{ relatedActivities.length }} </span>
-        <span>changes from </span>
+        <span>{{ __("changes from") }}</span>
         <span>{{ user }}</span>
 
         <Button
@@ -60,6 +60,7 @@
 </template>
 
 <script setup lang="ts">
+import { __ } from "@/translation";
 import { SelectIcon } from "@/components/icons";
 import { dateFormat, dateTooltipFormat, timeAgo } from "@/utils";
 import { computed, ref } from "vue";

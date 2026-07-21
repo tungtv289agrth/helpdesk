@@ -156,13 +156,38 @@ const _activities = computed(() => {
     };
   });
 
+  function formatActivityContent(h) {
+    if (h.activity_type === "Field Changed" && h.extra_value) {
+      const parts = h.extra_value.split("||");
+      return __("set {0} to {1}", __(parts[0]), __(parts[1]));
+    }
+    if (h.activity_type === "Field Cleared" && h.extra_value) {
+      return __("cleared {0}", __(h.extra_value));
+    }
+    if (h.activity_type === "Ticket Split") {
+      return __("split the ticket from {0}", h.extra_value);
+    }
+    if (h.activity_type === "Auto Closed") {
+      return __("automatically closed the ticket after {0} of inactivity", h.extra_value);
+    }
+    if (h.activity_type === "Assignment" && h.extra_value) {
+      try {
+        const { added, removed } = JSON.parse(h.extra_value);
+        const parts: string[] = [];
+        if (added?.length) parts.push(__("assigned {0}", added.join(", ")));
+        if (removed?.length) parts.push(__("unassigned {0}", removed.join(", ")));
+        return parts.join(" & ");
+      } catch {
+        return h.action ? __(h.action) : __("viewed this");
+      }
+    }
+    return h.action ? __(h.action) : __("viewed this");
+  }
+
   activities.value.data.history.map((h) => {
-    // }
-    h.action;
-    h.owner;
-    // if h.actions includes h.owner, replace it with 'themselves'
+    // if h.actions includes h.owner, replace it with 'themselves' (backward compat for old records)
     if (h.action && h.owner && h.action.includes(h.owner)) {
-      h.action = h.action.replace(h.owner, "themselves");
+      h.action = h.action.replace(h.owner, __("themselves"));
     }
     return h;
   });
@@ -173,8 +198,9 @@ const _activities = computed(() => {
   ].map((h) => {
     return {
       type: "history",
+      kind: "activity_type" in h ? h.activity_type : "view",
       key: h.creation,
-      content: h.action ? h.action : "viewed this",
+      content: formatActivityContent(h),
       creation: h.creation,
       user: h.user.name + " ",
     };
@@ -214,9 +240,7 @@ const _activities = computed(() => {
         if (
           nextActivity &&
           nextActivity.user === currentActivity.user &&
-          nextActivity.content !== "viewed this" &&
-          !nextActivity.content.includes("assigned") &&
-          !nextActivity.content.includes("unassigned")
+          nextActivity.kind !== "view"
         ) {
           currentActivity.relatedActivities.push(nextActivity);
         } else {
