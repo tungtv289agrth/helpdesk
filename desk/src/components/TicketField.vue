@@ -96,7 +96,7 @@ const component = computed(() => {
     return h(Autocomplete, {
       options: props.field.options
         .split("\n")
-        .map((o) => ({ label: o, value: o })),
+        .map((o) => ({ label: __(o), value: o })),
     });
   } else if (props.field.fieldtype === "Check") {
     return h(Autocomplete, {

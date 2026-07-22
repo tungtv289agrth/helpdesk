@@ -14,7 +14,7 @@
         >
           <template v-for="field in section.fields">
             <Link
-              v-if="field.visible"
+              v-if="field.visible && field.fieldtype !== 'Select'"
               :key="field.fieldname"
               :ref="(el) => setFieldRef(field.fieldname, el)"
               class="form-control-core"
@@ -29,6 +29,16 @@
               @update:model-value="
               (val:string) => handleFieldUpdate(field.fieldname, val,true)
             "
+            />
+            <Autocomplete
+              v-else-if="field.visible && field.fieldtype === 'Select'"
+              :key="field.fieldname"
+              :ref="(el) => setFieldRef(field.fieldname, el)"
+              class="form-control-core"
+              :placeholder="field.placeholder"
+              :options="field.selectOptions"
+              :model-value="field.value"
+              @update:model-value="(val) => handleFieldUpdate(field.fieldname, val, true)"
             />
           </template>
         </div>
@@ -126,7 +136,7 @@
                       class="text-xs px-2 py-0.5 font-base shrink-0 rounded-sm"
                       :class="getStatusColor(t.status as string)"
                     >
-                      {{ t.status }}
+                      {{ __(t.status) }}
                     </span>
                   </div>
                 </div>
@@ -141,7 +151,7 @@
 
 <script setup lang="ts">
 import { __ } from "@/translation";
-import { Link } from "@/components";
+import { Autocomplete, Link } from "@/components";
 import { parseField } from "@/composables/formCustomisation";
 import { useNotifyTicketUpdate } from "@/composables/realtime";
 import { useShortcut } from "@/composables/shortcuts";
@@ -290,20 +300,25 @@ function openTicket(name: string) {
 }
 
 function getFieldInFormat(fieldTemplate, fieldMeta) {
+  const isSelect = fieldMeta?.fieldtype === "Select";
+  const rawOptions = fieldMeta?.options || "";
   return {
-    label: fieldMeta?.label || fieldTemplate.fieldname,
+    label: __(fieldMeta?.label || fieldTemplate.fieldname),
     value: ticket.value.doc[fieldTemplate.fieldname],
     fieldtype: fieldMeta?.fieldtype,
-    doctype: fieldMeta?.options || "",
-    options: fieldMeta?.options || "",
+    doctype: isSelect ? "" : rawOptions,
+    options: rawOptions,
     placeholder:
       fieldTemplate.placeholder ||
-      `Enter ${fieldMeta?.label || fieldTemplate.fieldname}`,
+      __(`Enter ${fieldMeta?.label || fieldTemplate.fieldname}`),
     readonly: Boolean(fieldMeta.read_only),
     disabled: Boolean(fieldMeta.read_only),
     url_method: fieldTemplate.url_method || "",
     fieldname: fieldTemplate.fieldname,
     required: fieldTemplate.required || fieldMeta?.required || false,
+    selectOptions: isSelect
+      ? rawOptions.split("\n").filter(Boolean).map((o) => ({ label: __(o), value: o }))
+      : [],
     visible:
       fieldMeta.display_via_depends_on &&
       !fieldMeta.hidden &&

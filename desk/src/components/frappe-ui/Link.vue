@@ -179,7 +179,7 @@ const options = createResource({
     let allData = data.map((option) => {
       return {
         value: option.value,
-        label: option?.label || option.value,
+        label: __(option?.label || option.value),
         description: option?.description,
       };
     });

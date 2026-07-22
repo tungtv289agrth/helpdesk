@@ -7,7 +7,7 @@
         <Button
           ref="sendEmailRef"
           variant="ghost"
-          label="Reply"
+          :label="__('Reply Ticket')"
           :class="[
             showEmailBox ? '!bg-surface-gray-4 hover:!bg-surface-gray-3' : '',
           ]"
@@ -19,7 +19,7 @@
         </Button>
         <Button
           variant="ghost"
-          label="Comment"
+          :label="__('Comment Ticket')"
           :class="[
             showCommentBox ? '!bg-surface-gray-4 hover:!bg-surface-gray-3' : '',
           ]"
@@ -107,6 +107,7 @@
 </template>
 
 <script setup lang="ts">
+import { __ } from "@/translation";
 import { CommentTextEditor, EmailEditor, TypingIndicator } from "@/components";
 import { CommentIcon, EmailIcon } from "@/components/icons/";
 import { useDevice } from "@/composables";

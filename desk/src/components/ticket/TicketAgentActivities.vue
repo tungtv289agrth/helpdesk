@@ -104,13 +104,14 @@
     >
       <component :is="emptyTextIcon" class="h-7.5 w-7.5" />
       <span class="text-lg font-medium text-ink-gray-8">{{
-        __(emptyText)
+        emptyText
       }}</span>
     </div>
   </FadedScrollableDiv>
 </template>
 
 <script setup lang="ts">
+import { __ } from "@/translation";
 import { FadedScrollableDiv } from "@/components";
 import {
   ActivityIcon,
@@ -154,11 +155,11 @@ const { getUser } = useUserStore();
 const makeCall = inject<() => void>("makeCall");
 
 const emptyText = computed(() => {
-  if (props.title === "Emails") return "No email communications";
-  if (props.title === "Comments") return "No comments found";
-  if (props.title === "Calls") return "No calls made";
+  if (props.title === "Emails") return __("No email communications");
+  if (props.title === "Comments") return __("No comments found");
+  if (props.title === "Calls") return __("No calls made");
 
-  return "No activity found";
+  return __("No activity found");
 });
 
 const emptyTextIcon = computed(() => {
