@@ -157,9 +157,22 @@ const options = computed(() => ({
           { class: "flex items-center gap-1.5 justify-start w-full" },
           [
             h(IndicatorIcon, { class: status?.["parsed_color"] }),
-            h("span", { class: "truncate flex-1 text-base" }, label),
+            h("span", { class: "truncate flex-1 text-base" }, __(label)),
           ]
         );
+      },
+    },
+    ticket_type: {
+      custom: ({ item }) => {
+        return h("span", { class: "truncate" }, __(item));
+      },
+    },
+    priority: {
+      custom: ({ item }) => {
+        return h(Badge, {
+          label: __(item),
+          variant: "subtle",
+        });
       },
     },
     agreement_status: {

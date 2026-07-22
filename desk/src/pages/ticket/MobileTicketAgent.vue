@@ -8,7 +8,7 @@
         <div class="absolute right-0 pr-2">
           <Dropdown :options="dropdownOptions">
             <template #default="{ open }">
-              <Button :label="ticket.doc.status">
+              <Button :label="__(ticket.doc.status)">
                 <template #prefix>
                   <IndicatorIcon
                     :class="

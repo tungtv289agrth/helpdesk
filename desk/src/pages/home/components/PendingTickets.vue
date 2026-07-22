@@ -57,11 +57,11 @@
               {{ ticket.subject }}
             </td>
             <td class="p-2 py-3 min-w-20 truncate">
-              {{ ticket.status }}
+              {{ __(ticket.status) }}
             </td>
             <td class="p-2 py-3 min-w-20 truncate">
               <Badge
-                :label="ticket.priority"
+                :label="__(ticket.priority)"
                 :theme="getPriorityBadgeColor(ticket.priority_integer_value)"
               />
             </td>

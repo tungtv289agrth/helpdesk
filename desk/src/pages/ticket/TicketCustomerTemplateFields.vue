@@ -14,7 +14,7 @@
       <span
         class="flex-1 break-words rounded border border-outline-gray-2 bg-surface-white px-2 py-1 text-base font-medium text-ink-gray-9"
       >
-        {{ ticket.data.priority }}
+        {{ __(ticket.data.priority) }}
       </span>
     </div>
 

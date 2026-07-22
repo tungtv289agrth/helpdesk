@@ -111,7 +111,7 @@
                   class="px-1.5 py-[3px] text-sm rounded-sm max-w-[80px] text-center truncate h-5"
                   :class="getStatusColor(ticket.status)"
                 >
-                  {{ ticket.status }}
+                  {{ __(ticket.status) }}
                 </p>
               </div>
             </li>
