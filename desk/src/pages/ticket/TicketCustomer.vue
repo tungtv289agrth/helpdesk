@@ -10,6 +10,17 @@
           :actions="ticket.data._customActions"
         />
         <Button
+          v-if="ticket.data._original_status === 'Resolved'"
+          :label="__('Reopen Ticket')"
+          theme="gray"
+          variant="solid"
+          @click="handleReopen()"
+        >
+          <template #prefix>
+            <LucideRotateCcw class="size-4" />
+          </template>
+        </Button>
+        <Button
           v-if="ticket.data.status !== 'Closed'"
           :label="__('Close')"
           theme="gray"
@@ -103,6 +114,7 @@ import { useConfigStore } from "@/stores/config";
 import { globalStore } from "@/stores/globalStore";
 import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { isContentEmpty, isCustomerPortal, uploadFunction } from "@/utils";
+import LucideRotateCcw from "~icons/lucide/rotate-ccw";
 import LucideWarning from "~icons/lucide/triangle-alert";
 import { ActivityIcon, DetailsIcon } from "@/components/icons";
 import {
@@ -149,6 +161,7 @@ const ticket = createResource({
   },
   auto: true,
   onSuccess: (data) => {
+    data._original_status = data.status;
     data.status = getStatus(data.status)?.label_customer;
     setupCustomizations(ticket, {
       doc: data,
@@ -306,6 +319,30 @@ function handleClose() {
   } else {
     showConfirmationDialog();
   }
+}
+
+function handleReopen() {
+  $dialog({
+    title: __("Reopen Ticket"),
+    message: __("Are you sure you want to reopen this ticket?"),
+    actions: [
+      {
+        label: __("Confirm"),
+        variant: "solid",
+        onClick(close: Function) {
+          setValue.submit(
+            { fieldname: "status", value: "Open" },
+            {
+              onSuccess: () => {
+                toast.success(__("Ticket reopened successfully."));
+              },
+            }
+          );
+          close();
+        },
+      },
+    ],
+  });
 }
 
 function showConfirmationDialog() {
