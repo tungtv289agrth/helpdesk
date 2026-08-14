@@ -23,7 +23,7 @@
           <div
             class="text-base font-medium leading-none text-ink-gray-9 truncate"
           >
-            {{ config.brandName || "Helpdesk" }}
+            {{ config.brandName || __("Helpdesk") }}
           </div>
           <div class="mt-1 text-sm text-ink-gray-7">
             {{ authStore.userName }}
@@ -54,6 +54,7 @@ import { useAuthStore } from "@/stores/auth";
 import { useConfigStore } from "@/stores/config";
 import { useSidebarStore } from "@/stores/sidebar";
 import { Dropdown } from "frappe-ui";
+import { __ } from "@/translation";
 
 const config = useConfigStore();
 

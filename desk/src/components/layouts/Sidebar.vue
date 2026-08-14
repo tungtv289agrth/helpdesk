@@ -117,19 +117,6 @@
       </div>
 
       <SidebarLink
-        v-if="isOnboardingStepsCompleted && !isCustomerPortal"
-        :icon="HelpIcon"
-        :label="__('Help')"
-        :is-expanded="isExpanded"
-        @click="
-          () => {
-            showHelpModal = minimize ? true : !showHelpModal;
-            minimize = !showHelpModal;
-          }
-        "
-      />
-
-      <SidebarLink
         :icon="isExpanded ? LucideArrowLeftFromLine : LucideArrowRightFromLine"
         :is-active="false"
         :is-expanded="isExpanded"
@@ -143,19 +130,6 @@
     />
     <SettingsModal v-model="showSettingsModal" />
     <ShortcutsModal v-model="showShortcutsModal" />
-    <HelpModal
-      v-if="showHelpModal"
-      v-model="showHelpModal"
-      v-model:articles="articles"
-      appName="helpdesk"
-      title="Frappe Helpdesk"
-      :logo="logo"
-      docsLink="https://docs.frappe.io/helpdesk"
-      :afterSkip="(step: string) => capture('onboarding_step_skipped_' + step)"
-      :afterSkipAll="() => capture('onboarding_steps_skipped')"
-      :afterReset="(step: string) => capture('onboarding_step_reset_' + step)"
-      :afterResetAll="() => capture('onboarding_steps_reset')"
-    />
     <IntermediateStepModal
       v-model="showIntermediateModal"
       :currentStep="currentStep"
@@ -165,16 +139,14 @@
 </template>
 
 <script setup lang="ts">
-import HDLogo from "@/assets/logos/HDLogo.vue";
 import { Section, SidebarLink } from "@/components";
-import Apps from "@/components/Apps.vue";
 import CP from "@/components/command-palette/CP.vue";
-import { FrappeCloudIcon, InviteCustomer } from "@/components/icons";
+import { InviteCustomer } from "@/components/icons";
 import ShortcutsModal from "@/components/modals/ShortcutsModal.vue";
 import SettingsModal from "@/components/Settings/SettingsModal.vue";
 import UserMenu from "@/components/UserMenu.vue";
 import { useDevice } from "@/composables";
-import { confirmLoginToFrappeCloud } from "@/composables/fc";
+
 import { useScreenSize } from "@/composables/screen";
 import { currentView, useView } from "@/composables/useView";
 import { showNewContactModal } from "@/pages/desk/contact/dialogState";
@@ -186,20 +158,16 @@ import {
 import { useAuthStore } from "@/stores/auth";
 import { useNotificationStore } from "@/stores/notification";
 import { useSidebarStore } from "@/stores/sidebar";
-import { capture } from "@/telemetry";
 import { isCustomerPortal } from "@/utils";
 import { call, toast, useTheme } from "frappe-ui";
 import {
   GettingStartedBanner,
-  HelpModal,
   IntermediateStepModal,
   minimize,
   showHelpModal,
   TrialBanner,
   useOnboarding,
 } from "frappe-ui/frappe";
-
-import { HelpIcon } from "frappe-ui/icons";
 import { storeToRefs } from "pinia";
 import { computed, h, markRaw, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
@@ -343,7 +311,9 @@ const customerPortalDropdown = computed(() => [
 
 const agentPortalDropdown = computed(() => [
   {
-    component: markRaw(Apps),
+    label: __("Switch app"),
+    icon: "lucide-arrow-left-right",
+    onClick: switchApp,
   },
   {
     label: __("Customer portal"),
@@ -356,18 +326,7 @@ const agentPortalDropdown = computed(() => [
   {
     icon: "lucide-life-buoy",
     label: __("Support"),
-    onClick: () => window.open("https://t.me/frappedesk"),
-  },
-  {
-    icon: "lucide-book-open",
-    label: __("Docs"),
-    onClick: () => window.open("https://docs.frappe.io/helpdesk"),
-  },
-  {
-    label: __("Login to Frappe Cloud"),
-    icon: FrappeCloudIcon,
-    onClick: () => confirmLoginToFrappeCloud(),
-    condition: () => !isMobileView.value && window.is_fc_site,
+    onClick: () => window.open("https://bot.zaloplatforms.com/bots/2741100038390236707"),
   },
   {
     label: __("Shortcuts"),
@@ -409,13 +368,9 @@ function openCommandPalette() {
   showCommandPalette.value = true;
 }
 
-const logo = h(
-  HDLogo,
-  {
-    class: "h-12 w-12",
-  },
-  null
-);
+function switchApp() {
+  window.location.href = "/app";
+}
 
 const showOnboardingBanner = computed(() => {
   return (
@@ -557,83 +512,6 @@ const steps = [
   },
 ];
 
-const articles = ref([
-  {
-    title: __("Introduction"),
-    opened: false,
-    subArticles: [
-      { name: "introduction", title: __("Introduction") },
-      { name: "setting-up", title: __("Setting up") },
-    ],
-  },
-  {
-    title: __("Getting Started"),
-    opened: false,
-    subArticles: [
-      {
-        name: "lesson-1-your-first-ticket",
-        title: __("Creating a ticket"),
-      },
-      {
-        name: "lesson-2understanding-ticket-view",
-        title: __("Understanding ticket view"),
-      },
-      {
-        name: "lesson-3-agents-teams",
-        title: __("Agents & Teams"),
-      },
-      {
-        name: "customers-contacts",
-        title: __("Customers & Contacts"),
-      },
-      {
-        name: "lesson-4-knowledge-base",
-        title: __("Knowledge Base"),
-      },
-      {
-        name: "customer-portal",
-        title: __("Customer Portal"),
-      },
-    ],
-  },
-  {
-    title: __("Masters"),
-    opened: false,
-    subArticles: [
-      { name: "ticket", title: __("Ticket") },
-      { name: "agent", title: __("Agent") },
-      { name: "team", title: __("Team") },
-      { name: "contact", title: __("Contact") },
-      { name: "customer", title: __("Customer") },
-      { name: "knowledge-base", title: __("Knowledge Base") },
-      { name: "saved-replies", title: __("Saved Replies") },
-      { name: "service-level-agreement", title: __("Service Level Agreement") },
-      { name: "ticket-type", title: __("Ticket Type") },
-      { name: "ticket-priority", title: __("Ticket Priority") },
-    ],
-  },
-  {
-    title: __("Customizations"),
-    opened: false,
-    subArticles: [
-      { name: "custom-actions", title: __("Custom Actions") },
-      { name: "field-dependency", title: __("Field Dependency") },
-      { name: "custom-views", title: __("Custom Views") },
-      {
-        name: "settings",
-        title: __("Settings"),
-      },
-    ],
-  },
-  {
-    title: __("Frappe Helpdesk Mobile"),
-    opened: false,
-    subArticles: [
-      { name: "pwa-installation", title: __("Mobile App Installation") },
-    ],
-  },
-]);
-
 const showIntermediateModal = ref(false);
 const currentStep = ref({});
 
@@ -686,9 +564,6 @@ async function getGeneralCategory() {
 function setUpOnboarding() {
   if (!authStore.isManager) return;
   setUp(steps);
-  useShortcut({ key: "h", meta: true }, () => {
-    showHelpModal.value = !showHelpModal.value;
-  });
 }
 
 onMounted(() => {

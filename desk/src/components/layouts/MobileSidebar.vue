@@ -123,7 +123,6 @@ import { useTheme } from "frappe-ui";
 
 import { useAuthStore } from "@/stores/auth";
 import { isCustomerPortal } from "@/utils";
-import Apps from "../Apps.vue";
 import AvailabilityMenuMobile from "../AvailabilityMenuMobile.vue";
 import {
   agentPortalSidebarOptions,
@@ -213,7 +212,9 @@ const customerPortalDropdown = computed(() => [
 
 const agentPortalDropdown = computed(() => [
   {
-    component: markRaw(Apps),
+    label: __("Switch app"),
+    icon: "lucide-arrow-left-right",
+    onClick: switchApp,
   },
   ...(authStore.hasAgentRecord
     ? [
@@ -235,11 +236,6 @@ const agentPortalDropdown = computed(() => [
     label: __("Support"),
     onClick: () => window.open("https://t.me/frappedesk"),
   },
-  {
-    icon: "lucide-book-open",
-    label: __("Docs"),
-    onClick: () => window.open("https://docs.frappe.io/helpdesk"),
-  },
   themeMenuItem.value,
   {
     label: __("Log out"),
@@ -259,6 +255,10 @@ function isActiveTab(to: string) {
     return route.query.view == to?.query?.view;
   }
   return route.name === to;
+}
+
+function switchApp() {
+  window.location.href = "/apps";
 }
 </script>
 
