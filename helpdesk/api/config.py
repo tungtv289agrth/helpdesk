@@ -21,6 +21,6 @@ def get_config():
     res.favicon = (
         res.favicon
         or frappe.db.get_single_value("Website Settings", "favicon")
-        or "/assets/helpdesk/desk/favicon.svg"
+        or "/assets/helpdesk/desk/favicon.ico"
     )
     return res
