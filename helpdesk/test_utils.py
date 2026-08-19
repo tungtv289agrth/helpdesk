@@ -432,3 +432,17 @@ def upload_test_file(file_name: str) -> str:
         }
     ).insert(ignore_permissions=True)
     return file_doc.name
+
+
+def make_file(file_name: str, content: bytes, file_type: str | None = None):
+    """Create a standalone private File doc holding `content` in memory. Returns the File doc."""
+    file_doc = frappe.get_doc(
+        {
+            "doctype": "File",
+            "file_name": file_name,
+            "file_type": file_type,
+            "is_private": 1,
+            "content": content,
+        }
+    ).insert(ignore_permissions=True)
+    return file_doc

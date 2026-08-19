@@ -182,6 +182,72 @@ To setup the repository locally follow the steps mentioned below:
 
 **Note:** You'll find all the code related to Helpdesk's frontend inside `frappe-bench/apps/helpdesk/desk`
 
+## AI Summary — "Tải file lên" (Auto-fill ticket title & description)
+
+On the *New Ticket* page a floating button (**Tải file lên**) lets users pick
+a file (invoice, screenshot, document…). The system reads the file, asks an
+LLM for a short title and description, then auto-fills the **Tiêu đề**, **Mô
+tả** and **Đính kèm** fields. It is an optional shortcut — the regular manual
+flow is unchanged, and a user who already typed a title/description is never
+overwritten.
+
+### Python dependencies
+
+Installed from `pyproject.toml` (`pip install -e .` / `bench setup requirements`):
+`pymupdf`, `mammoth`, `pandas`, `pytesseract`, `pdf2image`,
+`opencv-python-headless`, `sumy`.
+
+### OS-level packages (required — cannot be installed via pip)
+
+These must be installed at the operating system level or the pipeline fails:
+
+```bash
+# Debian / Ubuntu
+sudo apt-get install -y \
+    tesseract-ocr \
+    tesseract-ocr-vie \
+    poppler-utils
+```
+
+- `tesseract-ocr` + `tesseract-ocr-vie`: OCR for scanned PDFs and images
+  (Vietnamese language pack).
+- `poppler-utils`: provides `pdftoppm`, required by `pdf2image`.
+
+### Configuration (`site_config.json`)
+
+The API key and model are **never hardcoded** — they are read from
+`sites/<site>/site_config.json`:
+
+```json
+{
+  "ai_summary_llm_api_key": "AIza...",
+  "ai_summary_llm_model": "gemini-2.5-flash",
+  "ai_summary_max_files_per_call": 3,
+  "ai_summary_max_file_size_mb": 15,
+  "ai_summary_rate_limit_per_user": 15,
+  "ai_summary_rate_limit_window_minutes": 10
+}
+```
+
+Do not commit the API key. The provider is the Google Gemini API
+(`generateContent`); the `...` in `ai_summary_llm_api_key` must be replaced
+with a valid key from <https://aistudio.google.com/apikey> and
+`ai_summary_llm_model` with a valid Gemini model id (e.g. `gemini-2.5-flash`).
+
+### How it works (synchronous, bounded)
+
+1. **App Guard** — file-type whitelist (pdf, docx, xlsx, csv, txt/md, png,
+   jpg/jpeg), ≤ 15 MB/file, ≤ 3 files/call, and a per-user Redis rate limit
+   (default 15 calls / 10 minutes). Violations stop here, before any LLM call.
+2. **Convert to text** — PDF (PyMuPDF), DOCX (mammoth), XLSX/CSV (pandas,
+   first 20 rows), TXT/MD direct; scans & images go through Tesseract OCR
+   (first page only). Each conversion has a 10s timeout.
+3. **Compress** — text over 3.000 chars/file or 10.000 chars total is reduced
+   with `sumy` (TextRank) instead of being cut.
+4. **LLM** — only plain text is sent to Google Gemini (10s timeout); the result is a
+   title (≤ 80 chars) + description (≤ 400 chars) or a
+   `not_enough_information` / `irrelevant_content` reason.
+
 
 ## Compatibility matrix 
 

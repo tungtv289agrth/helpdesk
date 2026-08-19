@@ -10,6 +10,16 @@ dynamic = ["version"]
 dependencies = [
     # Core dependencies
     "textblob==0.18.0.post0",
+
+    # AI summary feature (helpdesk.api.ai_summary)
+    # "pymupdf",                     # extract text from PDFs with a text layer
+    # "mammoth",                     # convert DOCX to markdown
+    # "pandas>=2.2,<3",              # read XLSX / CSV (first 20 rows); <3 to share env safely
+    # "pytesseract",                 # OCR for scans and images
+    # "pdf2image",                   # rasterize scanned PDFs before OCR
+    # "opencv-python-headless",      # pre-process images before OCR
+    # "sumy",                        # TextRank sentence compression
+    # ref erpatch
 ]
 [build-system]
 requires = ["flit_core >=3.4,<4"]

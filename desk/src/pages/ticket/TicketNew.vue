@@ -62,6 +62,17 @@
           <span class="block text-sm text-ink-gray-7">
             {{ __("Subject") }}
             <span class="place-self-center text-ink-red-3"> * </span>
+            <Badge
+              v-if="autoFilledSubject"
+              theme="red"
+              variant="subtle"
+              class="ml-2 align-middle"
+            >
+              <template #prefix>
+                <LucideTriangleAlert class="size-3.5" />
+              </template>
+              {{ __("Nội dung này do AI tạo, vui lòng kiểm soát lại") }}
+            </Badge>
           </span>
           <FormControl
             v-model="subject"
@@ -128,6 +139,8 @@
           </template>
         </TicketTextEditor>
       </div>
+
+      <AiTicketUpload @filled="onAiFilled" />
     </div>
   </div>
 </template>
@@ -145,9 +158,10 @@ import { globalStore } from "@/stores/globalStore";
 import { capture } from "@/telemetry";
 import { __ } from "@/translation";
 import { Field } from "@/types";
-import { isCustomerPortal, uploadFunction } from "@/utils";
+import { isCustomerPortal, isContentEmpty, uploadFunction } from "@/utils";
 import {
   Breadcrumbs,
+  Badge,
   Button,
   call,
   createListResource,
@@ -159,6 +173,8 @@ import { useOnboarding } from "frappe-ui/frappe";
 import sanitizeHtml from "sanitize-html";
 import { computed, defineAsyncComponent, onMounted, reactive, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import AiTicketUpload from "@/components/AiTicketUpload.vue";
+import LucideTriangleAlert from "~icons/lucide/triangle-alert";
 import SearchArticles from "../../components/SearchArticles.vue";
 const TicketTextEditor = defineAsyncComponent(
   () => import("./TicketTextEditor.vue")
@@ -182,6 +198,7 @@ const subject = ref("");
 const description = ref("");
 const attachments = ref([]);
 const templateFields = reactive({});
+const autoFilledSubject = ref(false);
 
 const template = createResource({
   url: "helpdesk.helpdesk.doctype.hd_ticket_template.api.get_one",
@@ -319,4 +336,31 @@ onMounted(() => {
     },
   });
 });
+
+function onAiFilled(payload: {
+  title: string | null;
+  summary: string | null;
+  files: any[];
+}) {
+  // Never overwrite what the user already typed (2.5).
+  if (payload.title && !subject.value.trim()) {
+    subject.value = payload.title;
+    autoFilledSubject.value = true;
+  }
+  if (payload.summary && isContentEmpty(description.value)) {
+    description.value = plainTextToHtml(payload.summary);
+  }
+  attachments.value = [...attachments.value, ...payload.files];
+}
+
+function plainTextToHtml(text: string) {
+  const escapeNode = document.createElement("div");
+  escapeNode.textContent = text;
+  const escaped = escapeNode.innerHTML;
+  return (
+    "<p>" +
+    escaped.replace(/\n{2,}/g, "</p><p>").replace(/\n/g, "<br>") +
+    "</p>"
+  );
+}
 </script>
