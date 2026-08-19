@@ -426,7 +426,36 @@ implementation at all times.
 
 ---
 
-### 3. Test Utilities — Always Use `helpdesk/test_utils.py`
+### 3. Merge & Conflict Resolution — Always Consult `docs/` First
+
+This project carries local customizations on top of upstream Frappe Helpdesk.
+When you fetch/merge/pull from `origin/main` (or `origin/develop`) and hit
+conflicts, the **default split is not upstream**: the local customizations must win.
+
+**Mandatory workflow:**
+
+1. **Before resolving any conflict**, read `docs/README.md` and the relevant
+   `docs/feature-*.md` files. Map each conflicted file to its doc via the table in
+   `docs/README.md`.
+2. Each feature doc has a **"Quyết định conflict"** section stating whether to
+   keep local / keep upstream / merge both. Follow it literally.
+3. Local-only customizations to always preserve:
+   - `__()`/`_()` translation wrappers on every UI string (i18n),
+   - `HD Ticket Activity` `activity_type`/`extra_value` schema + `log_ticket_activity`
+     signature, `get_history` fields, and the **Select-field `Autocomplete`** logic
+     in `TicketDetailsTab.vue`,
+   - Sidebar "Switch app" (`/app`) + Zalo Support link (no Apps/Help/Docs/Frappe Cloud),
+   - Reopen Ticket button in customer portal,
+   - favicon.ico branding,
+   - AI file-upload ("Tải file lên") feature (`helpdesk/api/ai_summary/`,
+     `AiTicketUpload.vue`, commented deps in `pyproject.toml`).
+4. After resolving, run `bench migrate` for any DB schema change
+   (`hd_ticket_activity`) and rebuild the frontend (`yarn build` in `desk/`).
+5. If a conflict file has no matching doc, ask the user before deciding.
+
+---
+
+### 4. Test Utilities — Always Use `helpdesk/test_utils.py`
 
 All backend test helpers must live in `helpdesk/test_utils.py` and be imported from there.
 Never define helper functions (factories, enable/disable toggles, fixture builders) directly
