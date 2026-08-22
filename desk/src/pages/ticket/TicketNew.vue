@@ -59,9 +59,9 @@
         :class="(subject.length >= 2 || description.length) && 'gap-5'"
       >
         <div class="flex flex-col gap-2">
-          <span class="block text-sm text-ink-gray-7">
+          <span class="block text-sm text-ink-gray-6">
             {{ __("Subject") }}
-            <span class="place-self-center text-ink-red-3"> * </span>
+            <span class="place-self-center text-ink-red-5"> * </span>
             <Badge
               v-if="autoFilledSubject"
               theme="red"
@@ -89,7 +89,7 @@
         <div v-if="isCustomerPortal">
           <h4
             v-show="subject.length <= 2 && description.length === 0"
-            class="text-p-sm text-ink-gray-4 ml-1"
+            class="text-p-sm text-ink-gray-4 ms-1"
           >
             {{ __("Please enter a subject to continue") }}
           </h4>
@@ -108,7 +108,7 @@
                 theme="gray"
                 variant="solid"
                 :disabled="
-                  $refs.editor.editor.isEmpty || ticket.loading || !subject
+                  $refs.editor?.editor?.isEmpty || ticket.loading || !subject
                 "
                 @click="() => ticket.submit()"
               />
@@ -125,6 +125,7 @@
           v-model:content="description"
           :placeholder="__('Detailed explanation')"
           expand
+          :uploadFunction="(file:any)=>uploadFunction(file)"
         >
           <template #bottom-right>
             <Button
@@ -132,7 +133,7 @@
               theme="gray"
               variant="solid"
               :disabled="
-                $refs.editor.editor.isEmpty || ticket.loading || !subject
+                $refs.editor?.editor?.isEmpty || ticket.loading || !subject
               "
               @click="() => ticket.submit()"
             />
@@ -193,8 +194,8 @@ const router = useRouter();
 const { $dialog } = globalStore();
 const { updateOnboardingStep } = useOnboarding("helpdesk");
 const { isManager, userId: userID } = useAuthStore();
-
-const subject = ref("");
+// Pre-filled by the command palette's "Create ticket …" fallback.
+const subject = ref(String(route.query.subject ?? ""));
 const description = ref("");
 const attachments = ref([]);
 const templateFields = reactive({});

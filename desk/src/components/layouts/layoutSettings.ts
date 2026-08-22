@@ -1,10 +1,17 @@
+import { ref } from "vue";
 import LucideBookOpen from "~icons/lucide/book-open";
-import LucideContact2 from "~icons/lucide/contact-2";
+import LucideUsers from "~icons/lucide/users";
 import LucideTicket from "~icons/lucide/ticket";
 import LucideLayoutDashboard from "~icons/lucide/layout-dashboard";
 import PhoneIcon from "../icons/PhoneIcon.vue";
 import LucideHome from "~icons/lucide/home";
 import { __ } from "@/translation";
+
+/**
+ * Shared rather than local to Sidebar.vue: the command palette opens it too, and
+ * the palette is the discovery surface for the shortcut system.
+ */
+export const showShortcutsModal = ref(false);
 
 export const agentPortalSidebarOptions = [
   {
@@ -29,7 +36,7 @@ export const agentPortalSidebarOptions = [
   },
   {
     label: __("Contacts"),
-    icon: LucideContact2,
+    icon: LucideUsers,
     to: "ContactList",
   },
   {

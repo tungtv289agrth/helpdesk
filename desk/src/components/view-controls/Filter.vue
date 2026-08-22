@@ -2,9 +2,9 @@
   <Popover placement="bottom-end">
     <template #target="{ togglePopover, close }">
       <div class="flex items-center w-fit">
-        <Button
-          :label="__('Filter')"
-          :class="filters?.size ? 'rounded-r-none' : ''"
+<Button
+            :label="__('Filter')"
+            :class="filters?.size ? 'rounded-e-none' : ''"
           @click="togglePopover"
         >
           <template #prefix><FilterIcon class="h-4" /></template>
@@ -19,7 +19,7 @@
         <Tooltip v-if="filters?.size" :text="__('Clear all Filter')">
           <div>
             <Button
-              class="rounded-l-none border-l"
+              class="rounded-s-none border-s"
               icon="lucide-x"
               @click.stop="clearfilter(close)"
             />
@@ -80,7 +80,7 @@
             </div>
             <div v-else class="flex items-center justify-between gap-2">
               <div class="flex items-center gap-2 flex-1">
-                <div class="w-13 pl-2 text-end text-base text-ink-gray-5">
+                <div class="w-13 ps-2 text-end text-base text-ink-gray-5">
                   {{ i == 0 ? __("Where") : __("And") }}
                 </div>
                 <div id="fieldname" class="!min-w-[140px]">
@@ -165,7 +165,6 @@ import FilterIcon from "@/components/icons/FilterIcon.vue";
 import { useScreenSize } from "@/composables/screen";
 import { useDebounceFn } from "@vueuse/core";
 import {
-  Autocomplete,
   Button,
   Combobox,
   DatePicker,
@@ -176,6 +175,7 @@ import {
   Popover,
   Tooltip,
 } from "frappe-ui";
+import Autocomplete from "@/components/frappe-ui/Autocomplete.vue";
 import { computed, h, inject } from "vue";
 import { __ } from "@/translation";
 

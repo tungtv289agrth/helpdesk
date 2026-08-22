@@ -1,221 +1,89 @@
 <template>
-  <div
-    class="flex select-none flex-col border-e border-outline-gray-modals bg-surface-menu-bar text-base duration-300 ease-in-out"
-    :style="{
-      'min-width': width,
-      'max-width': width,
-    }"
-  >
-    <div :class="isExpanded ? 'mx-0 p-2' : 'm-2'">
-      <UserMenu :options="profileSettings" />
-    </div>
-    <SidebarLink
-      v-if="!isCustomerPortal"
-      :label="__('Search')"
-      :icon="LucideSearch"
-      :on-click="() => openCommandPalette()"
-      :is-expanded="isExpanded"
-      class="mt-1.5"
-    >
-      <template #right>
-        <span class="flex items-center gap-0.5 font-medium text-ink-gray-5">
-          <component :is="device.modifierIcon" class="h-3 w-3" />
-          <span>K</span>
-        </span>
-      </template>
-    </SidebarLink>
-    <div v-if="!isCustomerPortal">
+  <AppSidebar :profile-settings="profileSettings">
+    <template #footer="{ isCollapsed }">
+      <!-- The Sidebar container already has p-2; the extra px-2 only fits when
+      expanded. Collapsed, it would squeeze the banners' icon buttons to 0. -->
       <div
-        v-if="notificationStore.unread"
-        class="absolute size-1.5 translate-x-6 translate-y-1 rounded-full bg-blue-400 left-1"
-        theme="gray"
-        variant="solid"
-      />
-      <SidebarLink
-        class="relative my-0.5"
-        :label="__('Notifications')"
-        :icon="LucideBell"
-        :on-click="() => notificationStore.toggle()"
-        :is-expanded="isExpanded"
+        class="flex flex-col gap-2"
+        :class="isCollapsed ? 'items-center' : 'px-2'"
       >
-        <template #right>
-          <Badge
-            v-if="isExpanded && notificationStore.unread"
-            :label="
-              notificationStore.unread > 9 ? '9+' : notificationStore.unread
-            "
-            theme="gray"
-            variant="subtle"
-          />
-        </template>
-      </SidebarLink>
-    </div>
-    <div
-      :class="[
-        'overflow-y-auto overflow-x-hidden',
-        !isExpanded && 'hide-scrollbar',
-      ]"
-    >
-      <div v-for="view in allViews" :key="view.label">
-        <!-- <div
-          v-if="!view.hideLabel && !isExpanded && view.views?.length"
-          class="mx-2 my-2 h-1 border-b"
-        /> -->
-        <div :class="['mx-2', isCustomerPortal ? 'my-1' : 'my-2.5']"></div>
-        <Section
-          :label="view.label"
-          :hideLabel="view.hideLabel"
-          :opened="isSectionOpen(view.label, view.opened)"
-        >
-          <template #header="{ opened, hide }">
-            <div
-              v-if="!hide"
-              class="flex cursor-pointer gap-1.5 px-2 text-base mx-2 font-medium text-ink-gray-5 transition-all duration-300 ease-in-out"
-              :class="
-                !isExpanded
-                  ? 'ml-0 h-0 overflow-hidden opacity-0'
-                  : 'pt-[11px] pb-2.5 w-auto opacity-100 '
-              "
-              @click="toggleSection(view.label, view.opened)"
-            >
-              <FeatherIcon
-                name="chevron-right"
-                class="h-4 text-ink-gray-9 transition-all duration-300 ease-in-out"
-                :class="{ 'rotate-90': isSectionOpen(view.label, view.opened) }"
-              />
-              <span>{{ __(view.label) }}</span>
-            </div>
-          </template>
-          <nav class="flex flex-col">
-            <SidebarLink
-              v-for="link in view.views"
-              :icon="link.icon"
-              :label="link.label"
-              :to="link.to"
-              :key="link.label"
-              :is-expanded="isExpanded"
-              :is-active="isActiveTab(link.to)"
-              class="my-0.5 emoji"
-              :onClick="link.onClick"
-            />
-          </nav>
-        </Section>
-      </div>
-    </div>
-    <div class="grow" />
-    <div class="flex flex-col gap-2 pb-2.5">
-      <div class="px-2">
         <TrialBanner
           v-if="isFCSite && !isCustomerPortal"
-          :isSidebarCollapsed="!isExpanded"
+          :isSidebarCollapsed="isCollapsed"
         />
         <GettingStartedBanner
           v-if="showOnboardingBanner"
-          :isSidebarCollapsed="!isExpanded"
+          :isSidebarCollapsed="isCollapsed"
           appName="helpdesk"
         />
+        <CustomerPortalPermissionBanner
+          v-if="showPermissionNoticeBanner"
+          :isSidebarCollapsed="isCollapsed"
+        />
       </div>
+    </template>
+  </AppSidebar>
 
-      <SidebarLink
-        :icon="isExpanded ? LucideArrowLeftFromLine : LucideArrowRightFromLine"
-        :is-active="false"
-        :is-expanded="isExpanded"
-        :label="isExpanded ? __('Collapse') : __('Expand')"
-        :on-click="() => (isExpanded = !isExpanded)"
-      />
-    </div>
-    <TrialBanner
-      v-if="isFCSite && !isCustomerPortal"
-      :isSidebarCollapsed="!isExpanded"
-    />
-    <SettingsModal v-model="showSettingsModal" />
-    <ShortcutsModal v-model="showShortcutsModal" />
-    <IntermediateStepModal
-      v-model="showIntermediateModal"
-      :currentStep="currentStep"
-    />
-    <CP v-model="showCommandPalette" />
-  </div>
+  <SettingsModal v-model="showSettingsModal" />
+  <ShortcutsModal v-model="showShortcutsModal" />
+  <IntermediateStepModal
+    v-model="showIntermediateModal"
+    :currentStep="currentStep"
+  />
 </template>
 
 <script setup lang="ts">
-import { Section, SidebarLink } from "@/components";
-import CP from "@/components/command-palette/CP.vue";
 import { InviteCustomer } from "@/components/icons";
+import CustomerPortalPermissionBanner from "@/components/layouts/CustomerPortalPermissionBanner.vue";
 import ShortcutsModal from "@/components/modals/ShortcutsModal.vue";
 import SettingsModal from "@/components/Settings/SettingsModal.vue";
-import UserMenu from "@/components/UserMenu.vue";
-import { useDevice } from "@/composables";
-
-import { useScreenSize } from "@/composables/screen";
-import { currentView, useView } from "@/composables/useView";
-import { showNewContactModal } from "@/pages/desk/contact/dialogState";
+import { showNewContactModal } from "@/pages/contact/dialogState";
 import {
   showAssignmentModal,
   showCommentBox,
   showEmailBox,
 } from "@/pages/ticket/modalStates";
 import { useAuthStore } from "@/stores/auth";
-import { useNotificationStore } from "@/stores/notification";
-import { useSidebarStore } from "@/stores/sidebar";
+import { useConfigStore } from "@/stores/config";
 import { isCustomerPortal } from "@/utils";
 import { call, toast, useTheme } from "frappe-ui";
 import {
   GettingStartedBanner,
   IntermediateStepModal,
   minimize,
-  showHelpModal,
   TrialBanner,
   useOnboarding,
 } from "frappe-ui/frappe";
-import { storeToRefs } from "pinia";
+
 import { computed, h, markRaw, onMounted, ref } from "vue";
-import { useRoute, useRouter } from "vue-router";
-import {
-  agentPortalSidebarOptions,
-  customerPortalSidebarOptions,
-} from "./layoutSettings";
+import { useRouter } from "vue-router";
+import AppSidebar from "./AppSidebar.vue";
+import { showShortcutsModal } from "./layoutSettings";
 
 import { useShortcut } from "@/composables/shortcuts";
 import { __ } from "@/translation";
-import LucideArrowLeftFromLine from "~icons/lucide/arrow-left-from-line";
-import LucideArrowRightFromLine from "~icons/lucide/arrow-right-from-line";
-import LucideBell from "~icons/lucide/bell";
 import FileText from "~icons/lucide/file-text";
 import Globe from "~icons/lucide/globe";
 import LucideKeyboard from "~icons/lucide/keyboard";
-import LucideMoon from "~icons/lucide/moon";
-import LucideSun from "~icons/lucide/sun";
 import LucideMail from "~icons/lucide/mail";
 import MailOpen from "~icons/lucide/mail-open";
 import MessageCircle from "~icons/lucide/message-circle";
-import LucideSearch from "~icons/lucide/search";
 import Ticket from "~icons/lucide/ticket";
 import Timer from "~icons/lucide/timer";
 import UserPen from "~icons/lucide/user-pen";
 import LucideUserPlus from "~icons/lucide/user-plus";
+import LucideMoon from "~icons/lucide/moon";
+import LucideSun from "~icons/lucide/sun";
 import { useTelephonyStore } from "@/stores/telephony";
 import {
   setActiveSettingsTab,
   showSettingsModal,
 } from "../Settings/settingsModal";
 
-const { isMobileView } = useScreenSize();
-const isRtl = document.documentElement.dir === "rtl";
-
-const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
-const notificationStore = useNotificationStore();
-const { isExpanded, width } = storeToRefs(useSidebarStore());
-const device = useDevice();
-const telephonyStore = useTelephonyStore();
-const { isCallingEnabled } = storeToRefs(telephonyStore);
+const configStore = useConfigStore();
 
-const showShortcutsModal = ref(false);
-const showCommandPalette = ref(false);
-
-const { pinnedViews, publicViews } = useView();
 const { currentTheme, toggleTheme } = useTheme();
 
 const themeMenuItem = computed(() => ({
@@ -226,76 +94,7 @@ const themeMenuItem = computed(() => ({
 
 const isFCSite = ref(window.is_fc_site);
 
-const sectionOpenState = ref<Record<string, boolean>>({});
-
-function isSectionOpen(label: string, defaultOpen: boolean): boolean {
-  if (!isExpanded.value) return true;
-  if (label in sectionOpenState.value) return sectionOpenState.value[label];
-  return defaultOpen;
-}
-
-function toggleSection(label: string, defaultOpen: boolean) {
-  const current = isSectionOpen(label, defaultOpen);
-  sectionOpenState.value[label] = !current;
-}
-
-const allViews = computed(() => {
-  let items = isCustomerPortal.value
-    ? customerPortalSidebarOptions
-    : agentPortalSidebarOptions;
-
-  if (!isCallingEnabled.value) {
-    items = items.filter((item) => item.label !== __("Call Logs"));
-  }
-
-  const options = [
-    {
-      label: __("All Views"),
-      hideLabel: true,
-      opened: true,
-      views: items,
-    },
-  ];
-  if (publicViews.value?.length && !isCustomerPortal.value) {
-    options.push({
-      label: __("Public Views"),
-      opened: true,
-      hideLabel: false,
-      views: parseViews(publicViews.value),
-    });
-  }
-  if (pinnedViews.value?.length) {
-    options.push({
-      label: __("Private Views"),
-      opened: true,
-      hideLabel: false,
-      views: parseViews(pinnedViews.value),
-    });
-  }
-  return options;
-});
-
-function parseViews(views) {
-  return views.map((view) => {
-    return {
-      label: view.label,
-      icon: view.icon,
-      to: {
-        name: view.route_name,
-        query: { view: view.name },
-      },
-      onClick: () => {
-        currentView.value = {
-          label: view.label,
-          icon: view.icon,
-        };
-      },
-    };
-  });
-}
-
 const customerPortalDropdown = computed(() => [
-  themeMenuItem.value,
   {
     group: __("Danger"),
     hideLabel: true,
@@ -357,20 +156,17 @@ const profileSettings = computed(() => {
     : agentPortalDropdown.value;
 });
 
-function isActiveTab(to: any) {
-  if (route.query.view) {
-    return route.query.view == to?.query?.view;
-  }
-  return route.name === to;
-}
-
-function openCommandPalette() {
-  showCommandPalette.value = true;
-}
-
 function switchApp() {
   window.location.href = "/app";
 }
+
+const showPermissionNoticeBanner = computed(() => {
+  return (
+    !isCustomerPortal.value &&
+    (authStore.isManager || authStore.isAdmin) &&
+    configStore.showCustomerPortalPermissionNotice
+  );
+});
 
 const showOnboardingBanner = computed(() => {
   return (
