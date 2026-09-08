@@ -21,7 +21,7 @@
           </template>
         </Button>
         <Button
-          v-if="ticket.data.status !== 'Closed'"
+          v-if="ticket.data._original_status === 'Resolved'"
           :label="__('Close')"
           theme="gray"
           variant="solid"
