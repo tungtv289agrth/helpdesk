@@ -4,49 +4,33 @@
     <div class="flex items-center justify-between border-b px-5 py-3">
 <span class="cursor-copy text-lg-semibold">{{ __("Ticket details") }}</span>
     </div>
-    <!-- user info and sla info -->
+    <!-- ticket id + sla info -->
     <div class="flex flex-col gap-4 pt-0 px-5 py-3 border-b">
-      <!-- user info -->
-      <div class="flex gap-2">
-        <Avatar
-          size="2xl"
-          :image="ticket.data.contact.image"
-          :label="ticket.data.contact.name"
-        />
-        <div class="flex items-center justify-between">
-          <Tooltip :text="ticket.data.contact.name">
-            <div class="w-[242px] truncate text-3xl-medium">
-              {{ ticket.data.contact.name }}
-            </div>
-          </Tooltip>
-          <div
-            class="flex gap-1.5"
-            v-if="
-              !ticket.data.feedback_rating && ticket.data.status !== 'Closed'
-            "
-          >
-            <Tooltip :text="ticket.data.contact.email_id">
-              <Button class="h-7 w-7" @click="emit('open')">
-                <template #icon>
-                  <EmailIcon class="h-4 w-4" />
-                </template>
-              </Button>
-            </Tooltip>
+      <!-- ticket id -->
+      <div
+        class="flex items-center justify-between rounded-lg bg-surface-gray-1 px-4 py-3 cursor-pointer transition-colors hover:bg-surface-gray-2 group"
+        @click="copyToClipboard(ticket.data.name, __('Ticket #{0} copied', [ticket.data.name]))"
+      >
+        <div class="flex items-center gap-3">
+          <div class="flex size-8 items-center justify-center rounded-md bg-surface-gray-2 text-ink-gray-6 group-hover:bg-surface-gray-3">
+            <LucideHash class="size-4" />
           </div>
+          <div class="flex flex-col">
+            <span class="text-xs text-ink-gray-5">{{ __("Ticket ID") }}</span>
+            <span class="text-lg font-semibold text-ink-gray-9">{{ ticket.data.name }}</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-1.5 text-xs text-ink-gray-5 opacity-0 group-hover:opacity-100 transition-opacity">
+          <LucideCopy class="size-3.5" />
+          <span>{{ __("Copy") }}</span>
         </div>
       </div>
 
-      <!-- Ticket Info -->
-      <div
-        class="flex items-center text-base leading-5"
-        v-for="field in ticketBasicInfo"
-      >
-        <span class="w-[126px] text-sm text-ink-gray-5">{{ field.label }}</span>
-        <span
-          class="text-base text-ink-gray-8 flex-1"
-          :class="!field.value && 'text-ink-gray-4'"
-        >
-          {{ field.value || "—" }}
+      <!-- Status -->
+      <div class="flex items-center text-base leading-5">
+        <span class="w-[126px] text-sm text-ink-gray-5">{{ __('Status') }}</span>
+        <span class="text-base text-ink-gray-8 flex-1">
+          {{ __(ticket.data.status) }}
         </span>
       </div>
 
@@ -96,7 +80,7 @@
       >
         <span class="w-[126px] text-sm text-ink-gray-5">{{ field.label }}</span>
         <span
-          class="text-base text-ink-gray-8 flex-1"
+          class="text-base text-ink-gray-8 flex-1 truncate"
           :class="!field.value && 'text-ink-gray-4'"
         >
           <template
@@ -113,6 +97,21 @@
           </template>
         </span>
       </div>
+
+      <!-- Assignee -->
+      <div class="flex items-center text-base leading-5">
+        <span class="w-[126px] text-sm text-ink-gray-5">{{ __('Assignee') }}</span>
+        <div class="flex-1 min-w-0">
+          <MultipleAvatar
+            v-if="assigneesList.length"
+            :avatars="ticket.data._assign"
+            size="xs"
+            :max="2"
+            hideName
+          />
+          <span v-else class="text-ink-gray-4">—</span>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -121,13 +120,18 @@
 import { __ } from "@/translation";
 import { ITicket } from "@/pages/ticket/symbols";
 import { Field } from "@/types";
-import { dateFormat, dateTooltipFormat, formatTime } from "@/utils";
-import { Avatar, dayjs, Tooltip } from "frappe-ui";
+import { copyToClipboard, dateFormat, dateTooltipFormat, formatTime } from "@/utils";
+import { dayjs, Tooltip } from "frappe-ui";
 import { computed, inject } from "vue";
-
-const emit = defineEmits(["open"]);
+import MultipleAvatar from "../MultipleAvatar.vue";
+import LucideHash from "~icons/lucide/hash";
+import LucideCopy from "~icons/lucide/copy";
 
 const ticket = inject(ITicket);
+
+const assigneesList = computed(() => {
+  return JSON.parse(ticket.data._assign || "[]");
+});
 
 const slaData = computed(() => {
   const firstResponse = firstResponseData();
@@ -210,18 +214,6 @@ function resolutionData() {
   }
   return resolution;
 }
-
-const ticketBasicInfo = computed(() => [
-  {
-    label: __("Ticket ID"),
-    value: ticket.data.name,
-  },
-  {
-    label: __("Status"),
-    value: __(ticket.data.status),
-    bold: true,
-  },
-]);
 
 const ticketAdditionalInfo = computed(() => {
   const fields = [
