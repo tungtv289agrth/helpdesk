@@ -102,14 +102,33 @@
       <div class="flex items-center text-base leading-5">
         <span class="w-[126px] text-sm text-ink-gray-5">{{ __('Assignee') }}</span>
         <div class="flex-1 min-w-0">
-          <MultipleAvatar
-            v-if="assigneesList.length"
-            :avatars="ticket.data._assign"
-            size="xs"
-            :max="2"
-            hideName
-          />
+          <template v-if="assigneesList.length === 1">
+            <div class="flex items-center gap-2">
+              <MultipleAvatar :avatars="ticket.data._assign" size="xs" :max="1" hideName />
+              <span class="text-base text-ink-gray-8 truncate">{{ getAssigneeEmail(assigneesList[0]) }}</span>
+            </div>
+          </template>
+          <template v-else-if="assigneesList.length > 1">
+            <div class="flex items-center gap-2">
+              <MultipleAvatar :avatars="ticket.data._assign" size="xs" :max="2" hideName />
+              <span class="text-sm text-ink-gray-6">{{ assigneesList.length }} {{ __('Người xử lý') }}</span>
+            </div>
+          </template>
           <span v-else class="text-ink-gray-4">—</span>
+        </div>
+      </div>
+
+      <!-- Tags -->
+      <div class="flex items-start gap-2 pt-1">
+        <span class="w-[126px] shrink-0 text-sm text-ink-gray-5 pt-0.5">{{ __('Tags') }}</span>
+        <div class="min-w-0 flex-1 flex flex-wrap gap-1.5">
+          <TagChip
+            v-for="tag in parsedTags"
+            :key="tag"
+            :tag="tag"
+            :color="tagColorToken(tag)"
+          />
+          <span v-if="!parsedTags.length" class="text-ink-gray-4">—</span>
         </div>
       </div>
     </div>
@@ -124,14 +143,38 @@ import { copyToClipboard, dateFormat, dateTooltipFormat, formatTime } from "@/ut
 import { dayjs, Tooltip } from "frappe-ui";
 import { computed, inject } from "vue";
 import MultipleAvatar from "../MultipleAvatar.vue";
+import TagChip from "../tag/TagChip.vue";
+import { colorToken, useTags } from "@/composables/useTags";
 import LucideHash from "~icons/lucide/hash";
 import LucideCopy from "~icons/lucide/copy";
 
 const ticket = inject(ITicket);
 
+const { tagListResource } = useTags();
+
 const assigneesList = computed(() => {
   return JSON.parse(ticket.data._assign || "[]");
 });
+
+function getAssigneeEmail(assignee: string) {
+  if (!assignee) return "";
+  return assignee.split("@")[0];
+}
+
+const parsedTags = computed(() => {
+  const tags = ticket.data._user_tags || "";
+  return tags
+    .split(",")
+    .map((t: string) => t.trim())
+    .filter(Boolean);
+});
+
+function tagColorToken(tag: string) {
+  return colorToken(
+    (tagListResource.data || []).find((t: { name: string }) => t.name === tag)
+      ?.color
+  );
+}
 
 const slaData = computed(() => {
   const firstResponse = firstResponseData();
