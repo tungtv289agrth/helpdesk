@@ -57,7 +57,14 @@
           class="[&_[role='tablist']]:px-3"
         >
           <template #tab-panel="{ tab }">
-            <TicketCustomerTemplateFields v-if="tab.name === 'details'" />
+            <div v-if="tab.name === 'details'" class="flex flex-col">
+              <TicketCustomerTemplateFields />
+              <ZaloNotificationCard
+                v-if="ticket.data?.name"
+                :ticketId="ticket.data.name"
+                class="border-t mx-3 mt-4 pt-4"
+              />
+            </div>
             <TicketConversation v-else :show-header="false" class="grow" />
           </template>
         </Tabs>
@@ -116,6 +123,7 @@ import { useTicketStatusStore } from "@/stores/ticketStatus";
 import { isContentEmpty, isCustomerPortal, uploadFunction } from "@/utils";
 import LucideRotateCcw from "~icons/lucide/rotate-ccw";
 import LucideWarning from "~icons/lucide/triangle-alert";
+import ZaloNotificationCard from "@/components/ticket-agent/ZaloNotificationCard.vue";
 import { ActivityIcon, DetailsIcon } from "@/components/icons";
 import {
   Alert,

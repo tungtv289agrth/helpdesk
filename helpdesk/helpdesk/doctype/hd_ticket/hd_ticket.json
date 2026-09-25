@@ -54,7 +54,7 @@
   "reference_tab",
   "additional_info",
   "contact",
-  "customer",
+   "customer",
   "email_account",
   "column_break_16",
   "via_customer_portal",
@@ -458,7 +458,7 @@
    "fieldtype": "Datetime",
    "label": "Last Customer Response",
    "read_only": 1
-    },
+  },
   {
    "default": "0",
    "fieldname": "raised_outside_working_hours",

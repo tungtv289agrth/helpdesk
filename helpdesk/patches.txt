@@ -52,3 +52,5 @@ helpdesk.patches.set_default_portal_settings
 helpdesk.patches.backfill_priority_level
 helpdesk.patches.add_tag_custom_fields
 helpdesk.patches.rename_purple_status_color
+helpdesk.patches.disable_email_enable_zalo
+helpdesk.patches.add_zalo_chat_id_fields

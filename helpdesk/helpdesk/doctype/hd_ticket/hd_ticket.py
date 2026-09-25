@@ -117,6 +117,8 @@ class HDTicket(Document):
         )
 
     def handle_email_feedback(self):
+        if self.skip_email_workflow():
+            return
         if (
             self.is_new()
             or self.via_customer_portal
@@ -184,6 +186,7 @@ class HDTicket(Document):
         if (
             not self.via_customer_portal
             and not frappe.flags.initial_sync
+            and not self.skip_email_workflow()
             and send_ack_email
         ):
             self.send_acknowledgement_email()
@@ -798,6 +801,111 @@ class HDTicket(Document):
         except Exception as e:
             frappe.throw(str(e))
 
+    def create_zalo_communication(self, message: str, recipient_id: str | None = None):
+        """Create Communication with medium Zalo for history. Caller handles actual Zalo API send."""
+        if not is_agent():
+            frappe.throw(
+                _("You are not permitted to send Zalo messages"), frappe.PermissionError
+            )
+        subject = f"Re: {self.subject}"
+        sender = frappe.session.user
+        # recipient display: use recipient_id or raised_by
+        recipients = recipient_id or self.raised_by or ""
+
+        communication = frappe.get_doc(
+            {
+                "communication_medium": "Zalo",
+                "communication_type": "Communication",
+                "content": message,
+                "doctype": "Communication",
+                "recipients": recipients,
+                "reference_doctype": "HD Ticket",
+                "reference_name": self.name,
+                "sender": sender,
+                "sent_or_received": "Sent",
+                "status": "Linked",
+                "subject": subject,
+            }
+        )
+
+        last_communication = self.get_last_communication()
+        if last_communication and last_communication.message_id:
+            communication.in_reply_to = last_communication.name
+
+        communication.insert(ignore_permissions=True)
+        capture_event("agent_replied_via_zalo")
+
+        # handle attachments if any? For Zalo we still attach to Communication + Ticket
+        return communication
+
+    @frappe.whitelist()
+    def reply_via_zalo(
+        self,
+        message: str,
+        recipient_id: str | None = None,
+        attachments: list[str] = [],
+    ):
+        """Agent reply via Zalo: create Communication (medium=Zalo) + send via Zalo OA."""
+        if not is_agent():
+            frappe.throw(
+                _("You are not permitted to reply via Zalo"), frappe.PermissionError
+            )
+        if not message or not message.strip():
+            frappe.throw(_("Message cannot be empty"))
+
+        # Check Zalo enabled
+        if not int(frappe.db.get_single_value("HD Settings", "enable_zalo_integration") or 0):
+            frappe.throw(_("Tích hợp Zalo chưa được bật. Vui lòng bật trong HD Settings > Zalo và nhập Zalo Bot Token"))
+
+        # Resolve recipient (Bot user_id) if not provided
+        if not recipient_id:
+            from helpdesk.utils.zalo import resolve_ticket_zalo_user_id
+
+            recipient_id = resolve_ticket_zalo_user_id(self)
+
+        communication = self.create_zalo_communication(message, recipient_id)
+
+        # Persist user_id to contact nếu chưa có
+        if recipient_id:
+            try:
+                if self.contact:
+                    contact_user_id = frappe.db.get_value("Contact", self.contact, "zalo_user_id")
+                    if not contact_user_id:
+                        frappe.db.set_value("Contact", self.contact, "zalo_user_id", recipient_id)
+            except Exception:
+                pass
+
+        for attachment in attachments:
+            file_url = frappe.db.get_value("File", attachment, "file_url")
+            if file_url:
+                self.attach_file_with_doc("Communication", communication.name, file_url)
+                self.attach_file_with_doc("HD Ticket", self.name, file_url)
+
+        # Send via Zalo API if we have recipient
+        if recipient_id:
+            try:
+                from helpdesk.utils.zalo import send_zalo_message
+
+                result = send_zalo_message(recipient_id, message)
+                if result and isinstance(result, dict):
+                    msg_id = None
+                    if result.get("result"):
+                        msg_id = result["result"].get("message_id")
+                    if not msg_id and result.get("data"):
+                        msg_id = result["data"].get("message_id") or result["data"].get("msg_id")
+                    if msg_id:
+                        frappe.db.set_value("Communication", communication.name, "message_id", msg_id)
+            except Exception as e:
+                frappe.db.set_value("Communication", communication.name, "delivery_status", "Error")
+                frappe.log_error(title="Zalo reply_via_zalo failed", message=str(e))
+                frappe.throw(str(e))
+        else:
+            frappe.msgprint(
+                _("Đã lưu lịch sử Zalo nhưng chưa có user_id của khách (Contact.zalo_user_id). Khách cần nhắn cho Bot trước để có user_id, hoặc nhập tay user_id ở trên.")
+            )
+
+        return {"communication": communication.name}
+
     @frappe.whitelist()
     # flake8: noqa
     def create_communication_via_contact(
@@ -870,6 +978,8 @@ class HDTicket(Document):
     def send_reply_email_to_agent(
         self, message: str = "Please check the latest update on the portal."
     ):
+        if self.skip_email_workflow():
+            return
         assigned_agents = self.get_assigned_agents()
         if not assigned_agents:
             return
@@ -902,6 +1012,8 @@ class HDTicket(Document):
             frappe.throw(_(e))
 
     def send_acknowledgement_email(self):
+        if self.skip_email_workflow():
+            return
         acknowledgement_email_content = frappe.db.get_single_value(
             "HD Settings", "acknowledgement_email_content"
         )

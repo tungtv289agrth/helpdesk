@@ -101,7 +101,7 @@ export default defineConfig(async ({ mode }) => {
       alias: {
         "@": path.resolve(__dirname, "src"),
         "tailwind.config.js": path.resolve(__dirname, "tailwind.config.js"),
-        // ...localFrappeUIAliases,
+        ...localFrappeUIAliases,
       },
       // frappe-ui is served from source (excluded from optimizeDeps) and the
       // submodule ships its own node_modules with older tiptap/ProseMirror.
@@ -111,8 +111,11 @@ export default defineConfig(async ({ mode }) => {
         // @framework/ui imports from vue/frappe-ui; force a single instance of
         // each so its Combobox shares helpdesk's frappe-ui, not a second copy.
         "vue",
+        "vue-router",
         "frappe-ui",
         "reka-ui",
+        "@vueuse/core",
+        "@vueuse/shared",
         "@tiptap/core",
         "@tiptap/pm",
         "prosemirror-state",

@@ -31,6 +31,7 @@ từ `origin/main` sẽ có nhiều conflict. Các file trong thư mục `docs/`
 | `8779ed2e7` | dùng favicon.ico làm logo & favicon | [feature-branding-favicon.md](feature-branding-favicon.md) |
 | `2efc266ee` | bỏ Apps/Help/Docs menur, thêm Switch app + Zalo link | [feature-sidebar-zalo.md](feature-sidebar-zalo.md) |
 | `c827d5c09` | AI file upload tự điền title/description | [feature-ai-summary.md](feature-ai-summary.md) |
+| *(new)* | tắt email toàn bộ, thay bằng gửi Zalo OA 1 chiều + lịch sử Communication medium=Zalo | [feature-zalo-integration.md](feature-zalo-integration.md) |
 
 ## File bị conflict nhiều khả năng nhất (đã sửa cả 2 bên)
 
@@ -40,8 +41,12 @@ từ `origin/main` sẽ có nhiều conflict. Các file trong thư mục `docs/`
 | `desk/src/components/ticket-agent/TicketDetailsTab.vue` | [feature-ticket-details.md](feature-ticket-details.md), [feature-i18n-translation.md](feature-i18n-translation.md) |
 | `desk/src/components/ticket-agent/TicketActivityPanel.vue` | [feature-activity-type.md](feature-activity-type.md) |
 | `desk/src/pages/ticket/Tickets.vue` | [feature-i18n-translation.md](feature-i18n-translation.md) |
-| `helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py` | [feature-activity-type.md](feature-activity-type.md) |
-| `helpdesk/helpdesk/doctype/hd_ticket/api.py` | [feature-activity-type.md](feature-activity-type.md) |
+| `helpdesk/helpdesk/doctype/hd_ticket/hd_ticket.py` | [feature-activity-type.md](feature-activity-type.md), [feature-zalo-integration.md](feature-zalo-integration.md) |
+| `helpdesk/helpdesk/doctype/hd_ticket/api.py` | [feature-activity-type.md](feature-activity-type.md), [feature-zalo-integration.md](feature-zalo-integration.md) |
+| `helpdesk/helpdesk/doctype/hd_settings/hd_settings.json` | [feature-zalo-integration.md](feature-zalo-integration.md) |
+| `desk/src/components/CommunicationArea.vue`, `EmailArea.vue`, `ticket-agent/TicketActivityPanel.vue`, `ZaloEditor.vue` | [feature-zalo-integration.md](feature-zalo-integration.md) |
+| `desk/src/pages/ticket/MobileTicketAgent.vue` | [feature-zalo-integration.md](feature-zalo-integration.md) |
+| `helpdesk/api/zalo.py`, `helpdesk/utils/zalo.py`, `helpdesk/patches/disable_email_enable_zalo.py` | [feature-zalo-integration.md](feature-zalo-integration.md) |
 | `helpdesk/helpdesk/doctype/hd_ticket_activity/*.json` | [feature-activity-type.md](feature-activity-type.md) |
 | `helpdesk/api/doc.py`, `helpdesk/utils.py` | [feature-i18n-translation.md](feature-i18n-translation.md) |
 | `desk/src/pages/ticket/TicketNew.vue` | [feature-ai-summary.md](feature-ai-summary.md) |

@@ -1,11 +1,7 @@
 <template>
   <div class="flex w-[382px] flex-col border-s gap-4">
-    <!-- Ticket ID -->
-    <div class="flex items-center justify-between border-b px-5 py-3">
-<span class="cursor-copy text-lg-semibold">{{ __("Ticket details") }}</span>
-    </div>
     <!-- ticket id + sla info -->
-    <div class="flex flex-col gap-4 pt-0 px-5 py-3 border-b">
+    <div class="flex flex-col gap-4 pt-3 px-5 py-3 border-b">
       <!-- ticket id -->
       <div
         class="flex items-center justify-between rounded-lg bg-surface-gray-1 px-4 py-3 cursor-pointer transition-colors hover:bg-surface-gray-2 group"
@@ -131,6 +127,13 @@
           <span v-if="!parsedTags.length" class="text-ink-gray-4">—</span>
         </div>
       </div>
+
+      <!-- Thông báo qua Zalo — chỉ portal -->
+      <ZaloNotificationCard
+        v-if="ticket.data?.name"
+        :ticketId="ticket.data.name"
+        class="border-t -mx-5 px-5 pt-4"
+      />
     </div>
   </div>
 </template>
@@ -144,6 +147,7 @@ import { dayjs, Tooltip } from "frappe-ui";
 import { computed, inject } from "vue";
 import MultipleAvatar from "../MultipleAvatar.vue";
 import TagChip from "../tag/TagChip.vue";
+import ZaloNotificationCard from "../ticket-agent/ZaloNotificationCard.vue";
 import { colorToken, useTags } from "@/composables/useTags";
 import LucideHash from "~icons/lucide/hash";
 import LucideCopy from "~icons/lucide/copy";
