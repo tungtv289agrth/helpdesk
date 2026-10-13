@@ -101,6 +101,20 @@ export default defineConfig(async ({ mode }) => {
       alias: {
         "@": path.resolve(__dirname, "src"),
         "tailwind.config.js": path.resolve(__dirname, "tailwind.config.js"),
+        // The linked @framework/ui (apps/frappe/ui) source may import
+        // packages it only declares as peer deps (vue, vue-router,
+        // reka-ui, @vueuse/core). Rollup resolves relative to the
+        // importer, so it never sees desk's copies and the production
+        // build fails with "failed to resolve import". Pin these to
+        // desk's installed copies so both local dev and `bench build`
+        // resolve (and dedupe to) a single copy. Logic of the linked
+        // code is untouched.
+        ...Object.fromEntries(
+          ["vue", "vue-router", "reka-ui", "@vueuse/core"].map((pkg) => [
+            pkg,
+            path.resolve(__dirname, "node_modules", ...pkg.split("/")),
+          ])
+        ),
         ...localFrappeUIAliases,
       },
       // frappe-ui is served from source (excluded from optimizeDeps) and the
