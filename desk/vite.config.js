@@ -25,6 +25,11 @@ export default defineConfig(async ({ mode }) => {
           outDir: `../helpdesk/public/desk`,
           emptyOutDir: true,
           indexHtmlPath: "../helpdesk/www/helpdesk/index.html",
+          // Disable sourcemaps: the desk bundle (~3700 modules) peaks
+          // 4-6GB RAM with sourcemaps on and gets OOM-killed (exit 137)
+          // during `bench build` on small builders. Maps are not needed
+          // for production assets and only bloat the image.
+          sourcemap: false,
         },
         frappeTypes: {
           input: {
